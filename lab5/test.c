@@ -1,5 +1,5 @@
-#include <cstdlib>
-#include <cstdio>
+#include <stdlib.h>
+#include <stdio.h>
 #include "extmem.h"
 
 int main(int argc, char **argv) {
@@ -27,7 +27,7 @@ int main(int argc, char **argv) {
   }
 
   /* Read the block from the hard disk */
-  if ((blk = readBlockFromDisk(1, &buf)) == nullptr) {
+  if ((blk = readBlockFromDisk(1, &buf)) == NULL) {
     perror("Reading Block Failed!\n");
     return -1;
   }

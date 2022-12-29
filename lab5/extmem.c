@@ -5,9 +5,9 @@
  * Jun 22, 2011
  */
 
-#include <cstdlib>
-#include <cstdio>
-#include <cstring>
+#include <stdlib.h>
+#include <stdio.h>
+#include <string.h>
 #include "extmem.h"
 
 Buffer *initBuffer(size_t bufSize, size_t blkSize, Buffer *buf) {
@@ -22,7 +22,7 @@ Buffer *initBuffer(size_t bufSize, size_t blkSize, Buffer *buf) {
 
   if (!buf->data) {
     perror("Buffer Initialization Failed!\n");
-    return nullptr;
+    return NULL;
   }
 
   memset(buf->data, 0, bufSize * sizeof(unsigned char));
@@ -38,7 +38,7 @@ unsigned char *getNewBlockInBuffer(Buffer *buf) {
 
   if (buf->numFreeBlk == 0) {
     perror("Buffer is full!\n");
-    return nullptr;
+    return NULL;
   }
 
   blkPtr = buf->data;
@@ -80,7 +80,7 @@ unsigned char *readBlockFromDisk(unsigned int addr, Buffer *buf) {
 
   if (buf->numFreeBlk == 0) {
     perror("Buffer Overflows!\n");
-    return nullptr;
+    return NULL;
   }
 
   blkPtr = buf->data;
@@ -97,7 +97,7 @@ unsigned char *readBlockFromDisk(unsigned int addr, Buffer *buf) {
 
   if (!fp) {
     perror("Reading Block Failed!\n");
-    return nullptr;
+    return NULL;
   }
 
   *blkPtr = BLOCK_UNAVAILABLE;

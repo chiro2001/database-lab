@@ -8,7 +8,7 @@
 #ifndef EXTMEM_H
 #define EXTMEM_H
 
-#include <cstdint>
+#include <stdint.h>
 
 #define BLOCK_AVAILABLE 0
 #define BLOCK_UNAVAILABLE 1

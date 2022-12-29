@@ -1,22 +1,32 @@
 //
 // Created by chiro on 22-12-29.
 //
-#include <cstdio>
-#include <cstdlib>
+#include <stdio.h>
+#include <stdlib.h>
 #include <debug_macros.h>
 #include "extmem.h"
 
 Buffer buf;
 
-void readBlock(unsigned int addr, char *&blk) {
-  Assert(nullptr != (blk = (char *) readBlockFromDisk(addr, &buf)), "Reading Block %u Failed", addr);
+char *readBlock(unsigned int addr) {
+  char *blk = NULL;
+  Assert(NULL != (blk = (char *) readBlockFromDisk(addr, &buf)), "Reading Block %u Failed", addr);
+  return blk;
 }
 
-void freeBlock(char *&blk) {
+void freeBlock(char *blk) {
   freeBlockInBuffer((unsigned char *) blk, &buf);
-  blk = nullptr;
 }
 
+// class buffered_queue {
+//   Buffer *buffer;
+//   int sz;
+//   unsigned int addr;
+//
+// public:
+//   buffered_queue(Buffer *buffer, int sz, unsigned int addr) : buffer(buffer), sz(sz), addr(addr) {}
+//
+// };
 
 int main() {
   Log("Lab5 program launched!");
@@ -33,9 +43,9 @@ int main() {
 
   unsigned int block = 17;
   while (block != 0) {
-    char *blk = nullptr;
+    char *blk = NULL;
     Log("Loading block %d", block);
-    readBlock(block, blk);
+    blk = readBlock(block);
     for (int i = 0; i < 7; i++) {
       int C = -1, D = -1;
       C = atoi(blk + i * 8);
