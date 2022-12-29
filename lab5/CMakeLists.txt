@@ -42,5 +42,7 @@ include_directories(${CMAKE_SOURCE_DIR})
 add_executable(lab5 extmem.c main.c)
 add_executable(mem_test extmem.c test.c)
 
+#target_compile_options(lab5 INTERFACE Og)
+
 add_test(NAME run_main WORKING_DIRECTORY ${CMAKE_SOURCE_DIR} COMMAND ${CMAKE_BINARY_DIR}/lab5)
 add_test(NAME run_mem_test WORKING_DIRECTORY ${CMAKE_SOURCE_DIR} COMMAND ${CMAKE_BINARY_DIR}/mem_test)

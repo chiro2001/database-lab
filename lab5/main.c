@@ -72,6 +72,12 @@ void buffered_queue_push(buffered_queue *self, char *tuple) {
       buffered_queue_blk *prev = tail->prev;
       if (prev != NULL) {
         prev->next = NULL;
+      } else {
+        self->linked_blk = malloc(sizeof(buffered_queue_blk));
+        self->linked_blk->blk = (char *) getNewBlockInBuffer(self->buffer);
+        self->linked_blk->next = NULL;
+        self->linked_blk->prev = NULL;
+        self->linked_blk->addr = self->addr;
       }
       Log("queue full, write block %d", tail->addr);
       writeBlockToDisk((unsigned char *) tail->blk, tail->addr, self->buffer);
@@ -148,6 +154,20 @@ int main() {
   }
   buffered_queue_flush(q);
   free(q);
+
+  Log("read results:");
+  block = 100;
+  while (block != 0) {
+    char *blk = NULL;
+    Log("Loading block %d", block);
+    blk = readBlock(block);
+    for (int i = 0; i < 7; i++) {
+      if (*(blk + i * 8) != '\0')
+        Log("(%s, %s)", blk + i * 8, blk + i * 8 + 4);
+    }
+    block = atoi(blk + 56);
+    freeBlock(blk);
+  }
 
   freeBuffer(&buf);
 
