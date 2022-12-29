@@ -8,16 +8,18 @@
 #ifndef EXTMEM_H
 #define EXTMEM_H
 
+#include <cstdint>
+
 #define BLOCK_AVAILABLE 0
 #define BLOCK_UNAVAILABLE 1
 
 typedef struct tagBuffer {
-    unsigned long numIO; /* Number of IO's*/
-    size_t bufSize; /* Buffer size*/
-    size_t blkSize; /* Block size */
-    size_t numAllBlk; /* Number of blocks that can be kept in the buffer */
-    size_t numFreeBlk; /* Number of available blocks in the buffer */
-    unsigned char *data; /* Starting address of the buffer */
+  unsigned long numIO; /* Number of IO's*/
+  size_t bufSize; /* Buffer size*/
+  size_t blkSize; /* Block size */
+  size_t numAllBlk; /* Number of blocks that can be kept in the buffer */
+  size_t numFreeBlk; /* Number of available blocks in the buffer */
+  unsigned char *data; /* Starting address of the buffer */
 } Buffer;
 
 /* Initialize a buffer with the specified buffer size and block size.
