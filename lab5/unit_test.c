@@ -3,7 +3,7 @@
 //
 #include "main_utils.h"
 #include "buffered_queue.h"
-#include "buffered_pool.h"
+#include "cache.h"
 
 int main() {
   srand(time(NULL));
@@ -35,15 +35,15 @@ int main() {
 
   buffer_free();
   buffer_init();
-  Log("TEST: buffered pool");
-  buffered_pool *p = buffered_pool_init(2);
+  Log("TEST: buffered cache");
+  cache *p = cache_init(2);
   for (int addr = 1; addr < 49; addr++) {
-    Assert(buffered_pool_read(p, addr) != NULL, "pool read err, addr: %d", addr);
+    Assert(cache_read(p, addr) != NULL, "cache read err, addr: %d", addr);
   }
   for (int i = 0; i < 500; i++) {
-    Assert(buffered_pool_read(p, (rand() % 48) + 1) != NULL, "pool read err, addr: %d", i);
+    Assert(cache_read(p, (rand() % 48) + 1) != NULL, "cache read err, addr: %d", i);
   }
-  buffered_pool_free(p);
+  cache_free(p);
   buffer_free();
   return 0;
 }

@@ -28,7 +28,6 @@ void indexed_select_binary_search(uint left, uint right, uint key, buffered_queu
   // } else {
   //
   // }
-
 }
 
 void q3() {
