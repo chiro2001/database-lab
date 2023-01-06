@@ -26,9 +26,11 @@ char *itoa(uint i);
 
 char *itot(uint a, uint b);
 
-uint atoi3(char *s);
+uint atoi3(const char *s);
 
 char *readBlock(uint addr);
+
+char *allocBlock();
 
 void freeBlock(char *blk);
 

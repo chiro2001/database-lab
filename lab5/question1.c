@@ -15,7 +15,7 @@ void q1() {
   iterate_range(17, 49, lambda(void, (char* c){
       if (SEQ(c, "128")) buffered_queue_push(q, c);
   }));
-  q->writeable = true;
+  q->flushable = true;
   buffered_queue_flush(q);
   buffered_queue_free(q);
 

@@ -47,4 +47,5 @@ add_executable(mem_test test.c ${SOURCE_LIST})
 #target_compile_options(lab5 INTERFACE Og)
 
 add_test(NAME run_main WORKING_DIRECTORY ${CMAKE_SOURCE_DIR} COMMAND ${CMAKE_BINARY_DIR}/lab5)
+add_test(NAME run_unit_test WORKING_DIRECTORY ${CMAKE_SOURCE_DIR} COMMAND ${CMAKE_BINARY_DIR}/unit_test)
 add_test(NAME run_mem_test WORKING_DIRECTORY ${CMAKE_SOURCE_DIR} COMMAND ${CMAKE_BINARY_DIR}/mem_test)

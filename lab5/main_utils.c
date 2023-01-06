@@ -19,11 +19,13 @@ char *itot(uint a, uint b) {
   return itot_buffer;
 }
 
-uint atoi3(char *s) {
+uint atoi3(const char *s) {
+  int a = s[0] - '0', b = s[1] - '0', c = s[2] - '0';
+  // Log("s: %s, v: %d%d%d", s, a, b, c);
   if (s[0] == '\0') return 0;
-  if (s[1] == '\0') return s[0] - '0';
-  if (s[2] == '\0') return (s[0] - '0') * 10 + (s[1] - '0');
-  return (s[0] - '0') * 100 + (s[1] - '0') * 10 + (s[0] - '0');
+  if (s[1] == '\0') return a;
+  if (s[2] == '\0') return a * 10 + b;
+  return a * 100 + b * 10 + c;
 }
 
 /**
@@ -46,14 +48,15 @@ void freeBlock(char *blk) {
 }
 
 void iterate_range(uint left, uint right, iter_handler(handler)) {
+  Log("iterate_range(%d, %d)", left, right);
   uint block = left;
   while (block != 0) {
     char *blk = NULL;
-    // Dbg("loading block %d", block);
+    Dbg("loading block %d", block);
     blk = readBlock(block);
-    for (int i = 0; i < 7; i++) {
-      handler(blk + i * 8);
-    }
+    if (handler != NULL)
+      for (int i = 0; i < 7; i++)
+        handler(blk + i * 8);
     block = atoi3(blk + 56);
     freeBlock(blk);
     if (block == right) break;

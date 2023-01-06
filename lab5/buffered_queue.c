@@ -17,8 +17,25 @@ buffered_queue *buffered_queue_init(int sz, uint addr, bool writeable) {
   q->buffer = &g_buf;
   q->addr = addr;
   q->total = sz;
-  q->writeable = writeable;
+  q->flushable = writeable;
   return q;
+}
+
+void buffered_queue_blk_insert(buffered_queue *self, char *blk) {
+  buffered_queue_blk *n = malloc(sizeof(buffered_queue_blk));
+  n->addr = self->addr;
+  n->blk = blk;
+  n->next = self->linked_blk;
+  n->prev = NULL;
+  if (self->linked_blk != NULL)
+    self->linked_blk->prev = n;
+  self->linked_blk = n;
+}
+
+void buffered_queue_set_next_addr(buffered_queue *self, bool continuous) {
+  strcpy(self->linked_blk->blk + 56,
+         itoa(!continuous && !self->flushable && (self->size == self->total - 1) ? 0 :
+              self->addr == -1 ? -1 : ++self->addr));
 }
 
 /**
@@ -29,7 +46,7 @@ buffered_queue *buffered_queue_init(int sz, uint addr, bool writeable) {
 void buffered_queue_push(buffered_queue *self, char *tuple) {
   Log("queue push (%s, %s)", tuple, tuple + 4);
   if (self->linked_blk == NULL) {
-    Log("init linked blocks, sizeof(buffered_queue_blk) = %lu", sizeof(buffered_queue_blk));
+    Dbg("init linked blocks, sizeof(buffered_queue_blk) = %lu", sizeof(buffered_queue_blk));
     self->linked_blk = malloc(sizeof(buffered_queue_blk));
     self->linked_blk->blk = (char *) getNewBlockInBuffer(self->buffer);
     self->linked_blk->next = NULL;
@@ -37,8 +54,7 @@ void buffered_queue_push(buffered_queue *self, char *tuple) {
     self->linked_blk->addr = self->addr;
   }
   if (self->offset == 56) {
-    // fill in next addr in this block
-    strcpy(self->linked_blk->blk + self->offset, itoa(self->addr == -1 ? -1 : ++self->addr));
+    buffered_queue_set_next_addr(self, false);
     self->offset = 0;
     if (self->size == self->total - 1) {
       buffered_queue_blk *tail = self->linked_blk;
@@ -55,7 +71,7 @@ void buffered_queue_push(buffered_queue *self, char *tuple) {
         self->linked_blk->prev = NULL;
         self->linked_blk->addr = self->addr;
       }
-      Assert(!self->writeable, "buffered queue cannot write!");
+      Assert(self->flushable, "buffered queue cannot write!");
       Log("queue full, write block %d", tail->addr);
       writeBlockToDisk((unsigned char *) tail->blk, tail->addr, self->buffer);
       free(tail);
@@ -65,19 +81,30 @@ void buffered_queue_push(buffered_queue *self, char *tuple) {
     // allocate one buffer, insert to link head
     Log("new buffer for block %d", self->addr);
     char *blk = (char *) getNewBlockInBuffer(self->buffer);
+    Assert(blk != NULL, "buffer full, cannot allocate new block for queue!");
     memset(blk, 0, 64);
-    buffered_queue_blk *n = malloc(sizeof(buffered_queue_blk));
-    Log("n=%p, self->linked_blk=%p", n, self->linked_blk);
-    Assert(n != self->linked_blk, "n == self->linked_blk == %p", n);
-    n->addr = self->addr;
-    n->blk = blk;
-    n->next = self->linked_blk;
-    n->prev = NULL;
-    self->linked_blk->prev = n;
-    self->linked_blk = n;
+    buffered_queue_blk_insert(self, blk);
   }
   memcpy(self->linked_blk->blk + self->offset, tuple, 8);
   self->offset += 8;
+}
+
+/**
+ * 直接读取插入一整个块，不额外占用缓冲区空间；需要原来 offset == 0
+ * @param self
+ * @param addr
+ */
+void buffered_queue_push_blk(buffered_queue *self, uint addr, bool continuous) {
+  Log("buffered_queue_push_blk(%d)", addr);
+  Assert(self->offset == 0 || self->offset == 56,
+         "insert blk, offset must == 0 | 56");
+  char *blk = readBlock(addr);
+  buffered_queue_blk_insert(self, blk);
+  // to support other inserts
+  // self->offset = 56;
+  buffered_queue_set_next_addr(self, continuous);
+  Log("write next addr for block [%d]: %s", self->linked_blk->addr, self->linked_blk->blk + 56);
+  self->size++;
 }
 
 buffered_queue_blk *buffered_queue_blk_tail(buffered_queue_blk *b) {
@@ -107,6 +134,7 @@ void buffered_queue_flush(buffered_queue *self) {
 }
 
 void buffered_queue_free(buffered_queue *self) {
+  Log("buffered_queue_free");
   buffered_queue_blk *h = self->linked_blk;
   while (h != NULL) {
     buffered_queue_blk *t = h;
