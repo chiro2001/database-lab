@@ -6,14 +6,14 @@
 
 char *iterator_next(iterator *it) {
   if (it->offset == 56) {
-    if (it->blk != NULL) freeBlock(it->blk);
+    if (it->blk != NULL) free_block(it->blk);
     if (it->now >= it->end - 1) {
       it->now++;
       it->blk = NULL;
       return NULL;
     } else {
       Dbg("iterator load new block: %d", it->now + 1);
-      it->blk = readBlock(++it->now);
+      it->blk = read_block(++it->now);
       it->offset = 0;
       return iterator_now(it);
     }
@@ -38,11 +38,11 @@ iterator *iterator_init(uint begin, uint end) {
   it->begin = begin;
   it->end = end;
   it->now = it->begin;
-  it->blk = readBlock(it->now);
+  it->blk = read_block(it->now);
   return it;
 }
 
 void iterator_free(iterator *it) {
-  if (it->blk != NULL) freeBlock(it->blk);
+  if (it->blk != NULL) free_block(it->blk);
   free(it);
 }

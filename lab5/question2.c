@@ -51,11 +51,6 @@ iterator *TPMM_reader_select(iterator *readers[BLK]) {
       }
     }
   }
-  if (r != NULL) {
-    Log("select smallest reader[%d]->now: (%s, %s)", s, smallest, smallest + 4);
-  } else {
-    Log("reader done");
-  }
   return r;
 }
 
@@ -88,6 +83,8 @@ void q2() {
   Log("Q2: 两阶段多路归并排序算法(TPMMS)");
   Log("利用内存缓冲区将关系 R 和 S 分别排序,并将排序后的结果存放在磁盘上。");
   Log("============================");
+  buffer_init();
   TPMMS(1, 17, 301);
-  // TPMMS(17, 49, 317);
+  TPMMS(17, 49, 317);
+  buffer_free();
 }

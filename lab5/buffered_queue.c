@@ -98,7 +98,7 @@ void buffered_queue_push_blk(buffered_queue *self, uint addr, bool continuous) {
   Log("buffered_queue_push_blk(%d)", addr);
   Assert(self->offset == 0 || self->offset == 56,
          "insert blk, offset must == 0 | 56");
-  char *blk = readBlock(addr);
+  char *blk = read_block(addr);
   buffered_queue_blk_insert(self, blk);
   // to support other inserts
   // self->offset = 56;

@@ -43,7 +43,16 @@ void tuple_copy(char *dest, char *src) {
  */
 Buffer g_buf;
 
-char *readBlock(uint addr) {
+void buffer_init() {
+  Assert(initBuffer((BLK * (BLK_SZ + 1)), BLK_SZ, &g_buf),
+         "Buffer Initialization Failed!\n");
+}
+
+void buffer_free() {
+  freeBuffer(&g_buf);
+}
+
+char *read_block(uint addr) {
   char *blk = NULL;
   Assert(NULL != (blk = (char *) readBlockFromDisk(addr, &g_buf)), "Reading Block %u Failed", addr);
   return blk;
@@ -53,7 +62,7 @@ char *allocBlock() {
   return (char *) getNewBlockInBuffer(&g_buf);
 }
 
-void freeBlock(char *blk) {
+void free_block(char *blk) {
   freeBlockInBuffer((unsigned char *) blk, &g_buf);
 }
 
@@ -63,12 +72,12 @@ void iterate_range(uint left, uint right, iter_handler(handler)) {
   while (block != 0) {
     char *blk = NULL;
     Dbg("loading block %d", block);
-    blk = readBlock(block);
+    blk = read_block(block);
     if (handler != NULL)
       for (int i = 0; i < 7; i++)
         handler(blk + i * 8);
     block = atoi3(blk + 56);
-    freeBlock(blk);
+    free_block(blk);
     if (block == right) break;
   }
 }

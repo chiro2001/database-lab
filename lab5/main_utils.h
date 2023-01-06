@@ -28,11 +28,15 @@ char *itot(uint a, uint b);
 
 uint atoi3(const char *s);
 
-char *readBlock(uint addr);
+void buffer_init();
+
+void buffer_free();
+
+char *read_block(uint addr);
 
 char *allocBlock();
 
-void freeBlock(char *blk);
+void free_block(char *blk);
 
 void iterate_range(uint left, uint right, iter_handler(handler));
 
