@@ -11,12 +11,13 @@ void q1() {
   Log("select S.C,S.D from S where S.C = 128");
   Log("=========================");
 
-  buffered_queue *q = buffered_queue_init(1, 100);
+  buffered_queue *q = buffered_queue_init(1, 100, false);
   iterate_range(17, 49, lambda(void, (char* c){
       if (SEQ(c, "128")) buffered_queue_push(q, c);
   }));
+  q->writeable = true;
   buffered_queue_flush(q);
-  free(q);
+  buffered_queue_free(q);
 
   Log("read results:");
   iterate_range(100, -1, lambda(void, (char* c){

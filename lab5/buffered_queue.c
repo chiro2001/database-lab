@@ -11,12 +11,13 @@
  * @param addr 起始写入地址
  * @return 新的 buffered_queue 结构体
  */
-buffered_queue *buffered_queue_init(int sz, uint addr) {
+buffered_queue *buffered_queue_init(int sz, uint addr, bool writeable) {
   buffered_queue *q = malloc(sizeof(buffered_queue));
   memset(q, 0, sizeof(buffered_queue));
   q->buffer = &g_buf;
   q->addr = addr;
   q->total = sz;
+  q->writeable = writeable;
   return q;
 }
 
@@ -37,7 +38,7 @@ void buffered_queue_push(buffered_queue *self, char *tuple) {
   }
   if (self->offset == 56) {
     // fill in next addr in this block
-    strcpy(self->linked_blk->blk + self->offset, itoa((self->addr == -1) ? -1 : (++self->addr)));
+    strcpy(self->linked_blk->blk + self->offset, itoa(self->addr == -1 ? -1 : ++self->addr));
     self->offset = 0;
     if (self->size == self->total - 1) {
       buffered_queue_blk *tail = self->linked_blk;
@@ -54,14 +55,13 @@ void buffered_queue_push(buffered_queue *self, char *tuple) {
         self->linked_blk->prev = NULL;
         self->linked_blk->addr = self->addr;
       }
+      Assert(!self->writeable, "buffered queue cannot write!");
       Log("queue full, write block %d", tail->addr);
       writeBlockToDisk((unsigned char *) tail->blk, tail->addr, self->buffer);
       free(tail);
     } else {
       self->size++;
     }
-    // if addr is -1, do not write, just panic
-    Assert(self->addr != -1, "buffered queue cannot write cause addr == -1!");
     // allocate one buffer, insert to link head
     Log("new buffer for block %d", self->addr);
     char *blk = (char *) getNewBlockInBuffer(self->buffer);
@@ -106,6 +106,17 @@ void buffered_queue_flush(buffered_queue *self) {
   self->offset = 0;
 }
 
+void buffered_queue_free(buffered_queue *self) {
+  buffered_queue_blk *h = self->linked_blk;
+  while (h != NULL) {
+    buffered_queue_blk *t = h;
+    h = h->next;
+    freeBlockInBuffer((unsigned char *) t->blk, &g_buf);
+    free(t);
+  }
+  free(self);
+}
+
 void buffered_queue_iterate(buffered_queue *self, iter_handler(handler)) {
   buffered_queue_blk *t = buffered_queue_blk_tail(self->linked_blk);
   if (t == NULL) return;
@@ -116,6 +127,10 @@ void buffered_queue_iterate(buffered_queue *self, iter_handler(handler)) {
     }
     t = t->prev;
   }
+}
+
+uint buffered_queue_count(buffered_queue *self) {
+  return self->size * 7 + (self->offset) / 8;
 }
 
 char **buffered_queue_blks(buffered_queue *self) {
@@ -135,10 +150,23 @@ char **buffered_queue_blks(buffered_queue *self) {
 
 char *buffered_queue_get(char **blks, uint index) {
   Assert(index <= BLK * 7, "index out of range");
-  return blks[index / 7] + index % 7;
+  return blks[index / 7] + (index % 7) * 8;
 }
 
-void *buffered_queue_sort(buffered_queue *self) {
+void buffered_queue_sort(buffered_queue *self, int order_by) {
   char **blks = buffered_queue_blks(self);
-
+  uint sz = buffered_queue_count(self);
+  // simple bubble sort
+  for (uint i = 0; i < sz; i++) {
+    for (uint j = 0; j < sz; j++) {
+      char *a = buffered_queue_get(blks, i);
+      char *b = buffered_queue_get(blks, j);
+      if (order_by == 0) {
+        if (CMP(a, b)) SWAP(a, b);
+      } else {
+        if (CMP(a + 4, b + 4)) SWAP(a + 4, b + 4);
+      }
+    }
+  }
+  free(blks);
 }

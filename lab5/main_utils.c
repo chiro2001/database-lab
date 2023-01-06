@@ -10,6 +10,15 @@ char *itoa(uint i) {
   return itoa_buffer;
 }
 
+char *itot(uint a, uint b) {
+  static char itot_buffer[9];
+  Assert(100 <= a && a <= 999, "a out of range");
+  Assert(100 <= b && b <= 999, "b out of range");
+  sprintf(itot_buffer, "%u %u", a, b);
+  itot_buffer[3] = '\0';
+  return itot_buffer;
+}
+
 uint atoi3(char *s) {
   if (s[0] == '\0') return 0;
   if (s[1] == '\0') return s[0] - '0';

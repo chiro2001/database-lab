@@ -16,13 +16,15 @@
 
 #define iter_handler(x) void (*(x))(char*)
 
-#define lambda( return_type, function_body) \
+#define lambda(return_type, function_body) \
   ({return_type lfunc function_body lfunc;})
 
 
 typedef uint uint;
 
 char *itoa(uint i);
+
+char *itot(uint a, uint b);
 
 uint atoi3(char *s);
 
@@ -44,5 +46,7 @@ extern Buffer g_buf;
 #define CMP(a, b) (a)[0] < (b)[0] ? true : \
                   (a)[1] < (b)[1] ? true : \
                   (a)[2] < (b)[2]
+#define SWAP_(a, b) do { char t = (a); (a) = (b); (b) = t; } while (0)
+#define SWAP(a, b) do { SWAP_((a)[0], (b)[0]); SWAP_((a)[1], (b)[1]); SWAP_((a)[2], (b)[2]); } while (0)
 
 #endif //LAB5_MAIN_UTILS_H

@@ -10,7 +10,7 @@ void TPMMS_sort_subsets(uint left, uint right) {
   uint rounds = blk_total / BLK +
                 ((blk_total % BLK) == 0 ? 0 : 1);
   for (uint r = 0; r < rounds; r++) {
-    buffered_queue *q = buffered_queue_init(BLK, -1);
+    buffered_queue *q = buffered_queue_init(BLK, -1, false);
     // load one subset
     for (uint p = 0; p < min(BLK, blk_total - r * BLK); p++) {
       iterate_range(r * BLK, (r + 1) * BLK, lambda(void, (char *c){
@@ -18,7 +18,7 @@ void TPMMS_sort_subsets(uint left, uint right) {
       }));
     }
 
-    free(q);
+    buffered_queue_free(q);
   }
 }
 
