@@ -36,6 +36,10 @@ void freeBlock(char *blk);
 
 void iterate_range(uint left, uint right, iter_handler(handler));
 
+bool cmp2(char *a, char *b);
+
+void tuple_copy(char *dest, char *src);
+
 extern Buffer g_buf;
 
 /// Some arguments

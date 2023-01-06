@@ -28,6 +28,16 @@ uint atoi3(const char *s) {
   return a * 100 + b * 10 + c;
 }
 
+bool cmp2(char *a, char *b) {
+  uint i = atoi3(a);
+  uint j = atoi3(b);
+  return i < j;
+}
+
+void tuple_copy(char *dest, char *src) {
+  memcpy(dest, src, 8);
+}
+
 /**
  * 全局的缓冲区
  */

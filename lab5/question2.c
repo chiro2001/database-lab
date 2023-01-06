@@ -19,6 +19,7 @@ void TPMMS_sort_subset(uint left, uint right, uint target, bool continous) {
 }
 
 void TPMMS_sort_subsets(uint left, uint right, uint target) {
+  Log("TPMMS_sort_subsets");
   uint blk_total = right - left;
   uint rounds = blk_total / BLK +
                 ((blk_total % BLK) == 0 ? 0 : 1);
@@ -30,20 +31,56 @@ void TPMMS_sort_subsets(uint left, uint right, uint target) {
         r != rounds - 1);
 }
 
+iterator *TPMM_reader_select(iterator *readers[BLK]) {
+  iterator *r = NULL;
+  int s = 0;
+  char smallest[9] = "";
+  for (int i = 0; i < BLK; i++) {
+    if (readers[i] == NULL) continue;
+    char *now = iterator_now(readers[i]);
+    if (now == NULL) continue;
+    if (smallest[0] == '\0') {
+      tuple_copy(smallest, now);
+      r = readers[i];
+      s = i;
+    } else {
+      if (cmp2(now, smallest)) {
+        tuple_copy(smallest, now);
+        r = readers[i];
+        s = i;
+      }
+    }
+  }
+  if (r != NULL) {
+    Log("select smallest reader[%d]->now: (%s, %s)", s, smallest, smallest + 4);
+  } else {
+    Log("reader done");
+  }
+  return r;
+}
+
 void TPMMS_merge_sort(uint left, uint right, uint target) {
+  Log("TPMMS_merge_sort");
   uint blk_total = right - left;
   uint reader_count = blk_total / BLK +
                       ((blk_total % BLK) == 0 ? 0 : 1);
   Assert(reader_count <= BLK, "merge sort cannot have readers more than %d", BLK);
   iterator *readers[BLK] = {NULL};
   for (int i = 0; i < reader_count; i++)
-    readers[i] = iterator_init(i * BLK, min((i + 1) * BLK, right));
-
+    readers[i] = iterator_init(left + i * BLK, left + min((i + 1) * BLK, right));
+  buffered_queue *q = buffered_queue_init(1, target, true);
+  iterator *reader;
+  while ((reader = TPMM_reader_select(readers)) != NULL) {
+    buffered_queue_push(q, iterator_next(reader));
+  }
+  buffered_queue_flush(q);
+  buffered_queue_free(q);
 }
 
 void TPMMS(uint left, uint right, uint target) {
   uint temp = target + 100;
   TPMMS_sort_subsets(left, right, temp);
+  TPMMS_merge_sort(temp, temp + (right - left), target);
 }
 
 void q2() {

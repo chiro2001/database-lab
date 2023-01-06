@@ -181,12 +181,6 @@ char *buffered_queue_get(char **blks, uint index) {
   return blks[index / 7] + (index % 7) * 8;
 }
 
-bool cmp2(char *a, char *b) {
-  uint i = atoi3(a);
-  uint j = atoi3(b);
-  return i < j;
-}
-
 void buffered_queue_sort(buffered_queue *self, int order_by) {
   char **blks = buffered_queue_blks(self);
   uint sz = buffered_queue_count(self);

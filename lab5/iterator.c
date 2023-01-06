@@ -7,7 +7,7 @@
 char *iterator_next(iterator *it) {
   if (it->offset == 56) {
     if (it->blk != NULL) freeBlock(it->blk);
-    if (it->now == it->end - 1) {
+    if (it->now >= it->end - 1) {
       it->now++;
       it->blk = NULL;
       return NULL;
@@ -16,12 +16,18 @@ char *iterator_next(iterator *it) {
       it->offset = 0;
     }
   }
-  char *r = it->blk + it->offset;
+  char *r = iterator_now(it);
   it->offset += 8;
   return r;
 }
 
+char *iterator_now(iterator *it) {
+  if (it->offset == 56 && it->now >= it->end - 1) return NULL;
+  return it->blk + it->offset;
+}
+
 iterator *iterator_init(uint begin, uint end) {
+  Log("iterator_init(%d, %d)", begin, end);
   iterator *it = malloc(sizeof(iterator));
   memset(it, 0, sizeof(iterator));
   it->begin = begin;

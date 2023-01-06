@@ -13,6 +13,7 @@ int main() {
   Assert(CMP("123", "124"), "CMP Failed!");
   Assert(CMP("100", "101"), "CMP Failed!");
   Assert(!CMP("100", "100"), "CMP Failed!");
+  Assert(CMP("333", "334"), "CMP Failed!");
   Log("TEST: Buffer size");
   Log("buffer free size: %zu", g_buf.numFreeBlk);
   Log("TEST: buffered queue sort");
