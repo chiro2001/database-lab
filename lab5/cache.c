@@ -4,12 +4,12 @@
 
 #include "cache.h"
 
-cache *cache_init(uint total) {
+cache *cache_init(uint capacity) {
   cache *p = malloc(sizeof(cache));
   memset(p, 0, sizeof(cache));
-  p->total = total;
-  p->cache = malloc(sizeof(cache_pair) * total);
-  memset(p->cache, 0, sizeof(cache_pair) * total);
+  p->capacity = capacity;
+  p->data = malloc(sizeof(cache_pair) * capacity);
+  memset(p->data, 0, sizeof(cache_pair) * capacity);
   return p;
 }
 
@@ -17,8 +17,8 @@ uint cache_read_cnt = 0;
 
 cache_pair *cache_find(cache *self, uint addr) {
   for (uint i = 0; i < self->size; i++) {
-    if (self->cache[i].addr == addr) {
-      return &self->cache[i];
+    if (self->data[i].addr == addr) {
+      return &self->data[i];
     }
   }
   return NULL;
@@ -26,9 +26,9 @@ cache_pair *cache_find(cache *self, uint addr) {
 
 void cache_insert(cache *self, uint addr) {
   Log("cache_insert(%d)", addr);
-  Assert(self->size < self->total, "insert failed, full");
+  Assert(self->size < self->capacity, "insert failed, full");
   // self->cache = realloc(self->cache, ++self->size);
-  cache_pair *cache = &self->cache[self->size];
+  cache_pair *cache = &self->data[self->size];
   cache->addr = addr;
   cache->blk = read_block(addr);
   cache->visit = cache_read_cnt;
@@ -38,7 +38,7 @@ void cache_insert(cache *self, uint addr) {
 void cache_remove_index(cache *self, int index) {
   Log("cache_remove_index(%d)", index);
   if (index < 0 || index >= self->size) return;
-  cache_pair *target = &self->cache[index];
+  cache_pair *target = &self->data[index];
   if (target == NULL) return;
   free_block(target->blk);
   // cache_pair *cache_new = malloc(sizeof(cache_pair) * (self->total));
@@ -54,14 +54,14 @@ void cache_remove_index(cache *self, int index) {
   // self->cache = cache_new;
 
   // move last item to target place
-  memcpy(self->cache + self->size, target, sizeof(cache_pair));
+  memcpy(self->data + self->size, target, sizeof(cache_pair));
   self->size--;
 }
 
 void cache_remove(cache *self, uint addr) {
   cache_pair *target = cache_find(self, addr);
   if (target == NULL) return;
-  cache_remove_index(self, (int) (target - self->cache));
+  cache_remove_index(self, (int) (target - self->data));
 }
 
 void cache_kick(cache *self) {
@@ -70,9 +70,9 @@ void cache_kick(cache *self) {
   uint oldest = -1;
   int index = -1;
   for (uint i = 0; i < self->size; i++) {
-    if (self->cache[i].visit < oldest) {
+    if (self->data[i].visit < oldest) {
       index = (int) i;
-      oldest = self->cache[i].visit;
+      oldest = self->data[i].visit;
     }
   }
   cache_remove_index(self, index);
@@ -88,7 +88,7 @@ char *cache_read(cache *self, uint addr) {
     return target->blk;
   }
   // miss, and full
-  if (self->size == self->total) {
+  if (self->size == self->capacity) {
     cache_kick(self);
   }
   cache_insert(self, addr);
@@ -98,6 +98,6 @@ char *cache_read(cache *self, uint addr) {
 }
 
 void cache_free(cache *self) {
-  free(self->cache);
+  free(self->data);
   free(self);
 }

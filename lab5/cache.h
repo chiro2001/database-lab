@@ -14,12 +14,12 @@ typedef struct {
 } cache_pair;
 
 typedef struct {
-  cache_pair *cache;
+  cache_pair *data;
   uint size;
-  uint total;
+  uint capacity;
 } cache;
 
-cache *cache_init(uint total);
+cache *cache_init(uint capacity);
 
 extern uint cache_read_cnt;
 
