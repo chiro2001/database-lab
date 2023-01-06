@@ -55,3 +55,11 @@ add_executable(mem_test test.c ${SOURCE_LIST})
 add_test(NAME run_main WORKING_DIRECTORY ${CMAKE_SOURCE_DIR} COMMAND ${CMAKE_BINARY_DIR}/lab5)
 add_test(NAME run_unit_test WORKING_DIRECTORY ${CMAKE_SOURCE_DIR} COMMAND ${CMAKE_BINARY_DIR}/unit_test)
 add_test(NAME run_mem_test WORKING_DIRECTORY ${CMAKE_SOURCE_DIR} COMMAND ${CMAKE_BINARY_DIR}/mem_test)
+
+
+add_custom_command(TARGET lab5 PRE_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy_directory
+        ${CMAKE_SOURCE_DIR}/data/ $<TARGET_FILE_DIR:lab5>/data/)
+add_custom_command(TARGET unit_test PRE_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy_directory
+        ${CMAKE_SOURCE_DIR}/data/ $<TARGET_FILE_DIR:lab5>/data/)

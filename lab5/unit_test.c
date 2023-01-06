@@ -36,8 +36,6 @@ int main() {
   buffer_free();
   buffer_init();
   Log("TEST: buffered pool");
-  read_block(1);
-  read_block(2);
   buffered_pool *p = buffered_pool_init(2);
   for (int addr = 1; addr < 49; addr++) {
     Assert(buffered_pool_read(p, addr) != NULL, "pool read err, addr: %d", addr);
