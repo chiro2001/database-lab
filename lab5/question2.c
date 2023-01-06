@@ -4,6 +4,7 @@
 #include "main_utils.h"
 #include "questions.h"
 #include "buffered_queue.h"
+#include "iterator.h"
 
 void TPMMS_sort_subset(uint left, uint right, uint target, bool continous) {
   buffered_queue *q = buffered_queue_init(BLK, target, false);
@@ -29,8 +30,20 @@ void TPMMS_sort_subsets(uint left, uint right, uint target) {
         r != rounds - 1);
 }
 
+void TPMMS_merge_sort(uint left, uint right, uint target) {
+  uint blk_total = right - left;
+  uint reader_count = blk_total / BLK +
+                      ((blk_total % BLK) == 0 ? 0 : 1);
+  Assert(reader_count <= BLK, "merge sort cannot have readers more than %d", BLK);
+  iterator *readers[BLK] = {NULL};
+  for (int i = 0; i < reader_count; i++)
+    readers[i] = iterator_init(i * BLK, min((i + 1) * BLK, right));
+
+}
+
 void TPMMS(uint left, uint right, uint target) {
-  TPMMS_sort_subsets(left, right, target);
+  uint temp = target + 100;
+  TPMMS_sort_subsets(left, right, temp);
 }
 
 void q2() {

@@ -39,7 +39,12 @@ target_compile_definitions(debug_macros INTERFACE
 )
 
 include_directories(${CMAKE_SOURCE_DIR})
-set(SOURCE_LIST extmem.c buffered_queue.c buffered_queue.h main_utils.h main_utils.c question1.c questions.h question2.c)
+set(SOURCE_LIST
+        extmem.c
+        buffered_queue.c buffered_queue.h
+        main_utils.h main_utils.c
+        iterator.c iterator.h
+        question1.c questions.h question2.c)
 add_executable(lab5 main.c ${SOURCE_LIST})
 add_executable(unit_test unit_test.c ${SOURCE_LIST})
 add_executable(mem_test test.c ${SOURCE_LIST})
