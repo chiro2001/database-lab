@@ -31,11 +31,11 @@ void TPMMS_sort_subsets(uint left, uint right, uint target) {
         r != rounds - 1);
 }
 
-iterator *TPMM_reader_select(iterator *readers[BLK]) {
+iterator *TPMM_reader_select(iterator *readers[BLK - 1]) {
   iterator *r = NULL;
   int s = 0;
   char smallest[9] = "";
-  for (int i = 0; i < BLK; i++) {
+  for (int i = 0; i < BLK - 1; i++) {
     if (readers[i] == NULL) continue;
     char *now = iterator_now(readers[i]);
     if (now == NULL) continue;
@@ -59,15 +59,16 @@ void TPMMS_merge_sort(uint left, uint right, uint target) {
   uint blk_total = right - left;
   uint reader_count = blk_total / BLK +
                       ((blk_total % BLK) == 0 ? 0 : 1);
-  Assert(reader_count <= BLK, "merge sort cannot have readers more than %d", BLK);
-  iterator *readers[BLK] = {NULL};
+  Assert(reader_count < BLK, "merge sort cannot have readers more than %d", BLK - 1);
+  iterator *readers[BLK - 1] = {NULL};
   for (int i = 0; i < reader_count; i++)
     readers[i] = iterator_init(left + i * BLK, left + min((i + 1) * BLK, right));
   buffered_queue *q = buffered_queue_init(1, target, true);
   iterator *reader;
-  while ((reader = TPMM_reader_select(readers)) != NULL) {
+  while ((reader = TPMM_reader_select(readers)) != NULL)
     buffered_queue_push(q, iterator_next(reader));
-  }
+  for (int i = 0; i < reader_count; i++)
+    iterator_free(readers[i]);
   buffered_queue_flush(q);
   buffered_queue_free(q);
 }
