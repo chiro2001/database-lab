@@ -21,9 +21,15 @@ void q1() {
   buffered_queue_free(q);
 
   Log("read results:");
+  uint count = 0;
   iterate_range(100, -1, lambda(void, (char* c){
-      if (*c) Log("(%s, %s)", c, c + 4);
+      if (*c) {
+        Log("(%s, %s)", c, c + 4);
+        count++;
+      }
   }));
 
+  Log("满足选择条件的元组一共 %d 个", count);
+  buffer_report();
   buffer_free();
 }

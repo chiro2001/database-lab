@@ -52,6 +52,10 @@ void buffer_free() {
   freeBuffer(&g_buf);
 }
 
+void buffer_report() {
+  Log("Buffer: IO 读写一共 %lu 次", g_buf.numIO);
+}
+
 char *read_block(uint addr) {
   char *blk = NULL;
   Assert(NULL != (blk = (char *) readBlockFromDisk(addr, &g_buf)), "Reading Block %u Failed", addr);

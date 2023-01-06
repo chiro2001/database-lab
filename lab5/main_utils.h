@@ -32,6 +32,8 @@ void buffer_init();
 
 void buffer_free();
 
+void buffer_report();
+
 char *read_block(uint addr);
 
 char *allocBlock();

@@ -86,5 +86,6 @@ void q2() {
   buffer_init();
   TPMMS(1, 17, 301);
   TPMMS(17, 49, 317);
+  buffer_report();
   buffer_free();
 }
