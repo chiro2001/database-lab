@@ -8,6 +8,8 @@ buffered_pool *buffered_pool_init(uint total) {
   buffered_pool *p = malloc(sizeof(buffered_pool));
   memset(p, 0, sizeof(buffered_pool));
   p->total = total;
+  p->pool = malloc(sizeof(buffered_pool_pair) * total);
+  memset(p->pool, 0, sizeof(buffered_pool_pair) * total);
   return p;
 }
 
@@ -24,27 +26,35 @@ buffered_pool_pair *buffered_pool_find(buffered_pool *self, uint addr) {
 
 void buffered_pool_insert(buffered_pool *self, uint addr) {
   Log("buffered_pool_insert(%d)", addr);
-  self->pool = realloc(self->pool, ++self->size);
-  self->pool[self->size - 1].addr = addr;
-  self->pool[self->size - 1].blk = read_block(addr);
+  Assert(self->size < self->total, "insert failed, full");
+  // self->pool = realloc(self->pool, ++self->size);
+  buffered_pool_pair *pool = &self->pool[self->size];
+  pool->addr = addr;
+  pool->blk = read_block(addr);
+  pool->visit = buffered_pool_read_cnt;
+  self->size++;
 }
 
 void buffered_pool_remove_index(buffered_pool *self, int index) {
+  Log("buffered_pool_remove_index(%d)", index);
   if (index < 0 || index >= self->size) return;
   buffered_pool_pair *target = &self->pool[index];
   if (target == NULL) return;
   free_block(target->blk);
-  buffered_pool_pair *pool_new = malloc(sizeof(buffered_pool_pair) * (self->size - 1));
-  memset(pool_new, 0, sizeof(buffered_pool) * (self->size - 1));
-  buffered_pool_pair *pool_tail = pool_new;
-  for (int i = 0; i < self->size; i++)
-    if (i != index) {
-      pool_tail->addr = self->pool[i].addr;
-      pool_tail->blk = self->pool[i].blk;
-      pool_tail++;
-    }
-  free(self->pool);
-  self->pool = pool_new;
+  // buffered_pool_pair *pool_new = malloc(sizeof(buffered_pool_pair) * (self->total));
+  // memset(pool_new, 0, sizeof(buffered_pool) * (self->total));
+  // buffered_pool_pair *pool_tail = pool_new;
+  // for (int i = 0; i < self->size; i++)
+  //   if (i != index) {
+  //     pool_tail->addr = self->pool[i].addr;
+  //     pool_tail->blk = self->pool[i].blk;
+  //     pool_tail++;
+  //   }
+  // free(self->pool);
+  // self->pool = pool_new;
+
+  // move last item to target place
+  memcpy(self->pool + self->size, target, sizeof(buffered_pool_pair));
   self->size--;
 }
 
@@ -70,6 +80,7 @@ void buffered_pool_kick(buffered_pool *self) {
 }
 
 char *buffered_pool_read(buffered_pool *self, uint addr) {
+  buffered_pool_read_cnt++;
   buffered_pool_pair *target = buffered_pool_find(self, addr);
   // hit
   if (target != NULL) return target->blk;
