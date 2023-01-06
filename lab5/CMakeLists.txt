@@ -44,7 +44,7 @@ set(SOURCE_LIST
         buffered_queue.c buffered_queue.h
         main_utils.h main_utils.c
         iterator.c iterator.h
-        question1.c questions.h question2.c)
+        questions.h question1.c question2.c question3.c)
 add_executable(lab5 main.c ${SOURCE_LIST})
 add_executable(unit_test unit_test.c ${SOURCE_LIST})
 add_executable(mem_test test.c ${SOURCE_LIST})

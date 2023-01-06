@@ -17,7 +17,7 @@ void TPMMS_sort_subset(uint left, uint right, uint target, bool continuous, bool
     uint index = left;
     uint offset = 0;
     buffered_queue_iterate(q, lambda(void, (char *s) {
-        strcpy(s, itoa((index + 10) * 10 + offset));
+        strcpy(s + 4, itoa((index + 10) * 10 + offset));
         offset++;
         if (offset == 7) {
           offset = 0;
