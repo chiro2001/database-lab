@@ -32,7 +32,7 @@ void freeBlock(char *blk);
 
 void iterate_range(uint left, uint right, iter_handler(handler));
 
-extern Buffer buf;
+extern Buffer g_buf;
 
 /// Some arguments
 #define BLK_SZ 64
@@ -40,5 +40,9 @@ extern Buffer buf;
 
 #define min(a, b) ((a) < (b) ? (a) : (b))
 #define max(a, b) ((a) > (b) ? (a) : (b))
+
+#define CMP(a, b) (a)[0] < (b)[0] ? true : \
+                  (a)[1] < (b)[1] ? true : \
+                  (a)[2] < (b)[2]
 
 #endif //LAB5_MAIN_UTILS_H

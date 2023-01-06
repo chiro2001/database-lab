@@ -14,7 +14,7 @@
 buffered_queue *buffered_queue_init(int sz, uint addr) {
   buffered_queue *q = malloc(sizeof(buffered_queue));
   memset(q, 0, sizeof(buffered_queue));
-  q->buffer = &buf;
+  q->buffer = &g_buf;
   q->addr = addr;
   q->total = sz;
   return q;

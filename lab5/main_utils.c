@@ -20,20 +20,20 @@ uint atoi3(char *s) {
 /**
  * 全局的缓冲区
  */
-Buffer buf;
+Buffer g_buf;
 
 char *readBlock(uint addr) {
   char *blk = NULL;
-  Assert(NULL != (blk = (char *) readBlockFromDisk(addr, &buf)), "Reading Block %u Failed", addr);
+  Assert(NULL != (blk = (char *) readBlockFromDisk(addr, &g_buf)), "Reading Block %u Failed", addr);
   return blk;
 }
 
 char *allocBlock() {
-  return (char *) getNewBlockInBuffer(&buf);
+  return (char *) getNewBlockInBuffer(&g_buf);
 }
 
 void freeBlock(char *blk) {
-  freeBlockInBuffer((unsigned char *) blk, &buf);
+  freeBlockInBuffer((unsigned char *) blk, &g_buf);
 }
 
 void iterate_range(uint left, uint right, iter_handler(handler)) {
