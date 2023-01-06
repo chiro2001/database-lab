@@ -83,7 +83,10 @@ char *buffered_pool_read(buffered_pool *self, uint addr) {
   buffered_pool_read_cnt++;
   buffered_pool_pair *target = buffered_pool_find(self, addr);
   // hit
-  if (target != NULL) return target->blk;
+  if (target != NULL) {
+    target->visit = buffered_pool_read_cnt;
+    return target->blk;
+  }
   // miss, and full
   if (self->size == self->total) {
     buffered_pool_kick(self);

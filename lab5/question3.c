@@ -21,13 +21,14 @@ void create_index_range(uint left, uint right, uint addr) {
 }
 
 void indexed_select_binary_search(uint left, uint right, uint key, buffered_queue *target) {
-  if (right - left > BLK - 1) {
-    for (uint i = left; i < right; i += BLK - 1) {
-      indexed_select_binary_search(i, min(i + BLK - 1, right), key, target);
-    }
-  } else {
+  // if (right - left > BLK - 1) {
+  //   for (uint i = left; i < right; i += BLK - 1) {
+  //     indexed_select_binary_search(i, min(i + BLK - 1, right), key, target);
+  //   }
+  // } else {
+  //
+  // }
 
-  }
 }
 
 void q3() {
