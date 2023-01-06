@@ -6,6 +6,10 @@
 #include <debug_macros.h>
 #include "extmem.h"
 
+#define SEQ2(a, b) (((a)[0]==(b)[0])&&((a)[1]==(b)[1]))
+#define SEQ3(a, b) (SEQ2(a,b)&&((a)[2]==(b)[2]))
+#define SEQ(a, b) SEQ3(a, b)
+
 Buffer buf;
 
 char *readBlock(unsigned int addr) {
@@ -140,10 +144,7 @@ int main() {
     Log("Loading block %d", block);
     blk = readBlock(block);
     for (int i = 0; i < 7; i++) {
-      int C = -1, D = -1;
-      C = atoi(blk + i * 8);
-      D = atoi(blk + i * 8 + 4);
-      if (C == 128) {
+      if (SEQ("128", blk + i * 8)) {
         Log("(%s, %s)", blk + i * 8, blk + i * 8 + 4);
         buffered_queue_push(q, blk + i * 8);
       }
