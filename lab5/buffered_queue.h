@@ -25,7 +25,7 @@ typedef struct {
   bool flushable;
 } buffered_queue;
 
-buffered_queue *buffered_queue_init(int sz, uint addr, bool writeable);
+buffered_queue *buffered_queue_init(int sz, uint addr, bool flushable);
 
 void buffered_queue_push(buffered_queue *self, char *tuple);
 

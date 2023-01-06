@@ -42,6 +42,7 @@ include_directories(${CMAKE_SOURCE_DIR})
 set(SOURCE_LIST
         extmem.c
         buffered_queue.c buffered_queue.h
+        buffered_pool.c buffered_pool.h
         main_utils.h main_utils.c
         iterator.c iterator.h
         questions.h question1.c question2.c question3.c)

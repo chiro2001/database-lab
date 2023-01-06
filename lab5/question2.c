@@ -6,25 +6,11 @@
 #include "buffered_queue.h"
 #include "iterator.h"
 
-void TPMMS_sort_subset(uint left, uint right, uint target, bool continuous, bool create_index) {
+void TPMMS_sort_subset(uint left, uint right, uint target, bool continuous) {
   buffered_queue *q = buffered_queue_init(BLK, target, false);
   // load one subset
   for (uint addr = left; addr < right; addr++)
     buffered_queue_push_blk(q, addr, continuous);
-  if (create_index) {
-    // storage index to secondary place
-    // I = [(block: <= 89) + 10][offset: 0-6]
-    uint index = left;
-    uint offset = 0;
-    buffered_queue_iterate(q, lambda(void, (char *s) {
-        strcpy(s + 4, itoa((index + 10) * 10 + offset));
-        offset++;
-        if (offset == 7) {
-          offset = 0;
-          index++;
-      }
-    }));
-  }
   // sort in this subset
   buffered_queue_sort(q, 0);
   q->flushable = true;
@@ -32,7 +18,7 @@ void TPMMS_sort_subset(uint left, uint right, uint target, bool continuous, bool
   buffered_queue_free(q);
 }
 
-void TPMMS_sort_subsets(uint left, uint right, uint target, bool create_index) {
+void TPMMS_sort_subsets(uint left, uint right, uint target) {
   Log("TPMMS_sort_subsets");
   uint blk_total = right - left;
   uint rounds = blk_total / BLK +
@@ -42,8 +28,7 @@ void TPMMS_sort_subsets(uint left, uint right, uint target, bool create_index) {
         left + r * BLK,
         left + (r + 1) * BLK,
         target + r * BLK,
-        r != rounds - 1,
-        create_index);
+        r != rounds - 1);
 }
 
 iterator *TPMM_reader_select(iterator *readers[BLK - 1]) {
@@ -88,9 +73,9 @@ void TPMMS_merge_sort(uint left, uint right, uint target) {
   buffered_queue_free(q);
 }
 
-void TPMMS(uint left, uint right, uint target, bool create_index) {
+void TPMMS(uint left, uint right, uint target) {
   uint temp = target + 100;
-  TPMMS_sort_subsets(left, right, temp, create_index);
+  TPMMS_sort_subsets(left, right, temp);
   TPMMS_merge_sort(temp, temp + (right - left), target);
 }
 
@@ -100,8 +85,8 @@ void q2() {
   Log("利用内存缓冲区将关系 R 和 S 分别排序,并将排序后的结果存放在磁盘上。");
   Log("============================");
   buffer_init();
-  TPMMS(1, 17, 301, false);
-  TPMMS(17, 49, 317, false);
+  TPMMS(1, 17, 301);
+  TPMMS(17, 49, 317);
   buffer_report();
   buffer_free();
 }

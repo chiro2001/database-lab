@@ -11,13 +11,13 @@
  * @param addr 起始写入地址
  * @return 新的 buffered_queue 结构体
  */
-buffered_queue *buffered_queue_init(int sz, uint addr, bool writeable) {
+buffered_queue *buffered_queue_init(int sz, uint addr, bool flushable) {
   buffered_queue *q = malloc(sizeof(buffered_queue));
   memset(q, 0, sizeof(buffered_queue));
   q->buffer = &g_buf;
   q->addr = addr;
   q->total = sz;
-  q->flushable = writeable;
+  q->flushable = flushable;
   return q;
 }
 
@@ -90,7 +90,7 @@ void buffered_queue_push(buffered_queue *self, char *tuple) {
 }
 
 /**
- * 直接读取插入一整个块，不额外占用缓冲区空间；需要原来 offset == 0
+ * 直接读取插入一整个块，不额外占用缓冲区空间
  * @param self
  * @param addr
  */
