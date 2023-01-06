@@ -135,8 +135,8 @@ uint buffered_queue_count(buffered_queue *self) {
 
 char **buffered_queue_blks(buffered_queue *self) {
   buffered_queue_blk *t = buffered_queue_blk_tail(self->linked_blk);
-  char **blks = malloc(sizeof(char *) * BLK);
-  memset(blks, 0, sizeof(char *) * BLK);
+  char **blks = malloc(sizeof(char *) * (BLK + 1));
+  memset(blks, 0, sizeof(char *) * (BLK + 1));
   if (t == NULL) return blks;
   char **p = blks;
   while (t != NULL) {
@@ -153,18 +153,24 @@ char *buffered_queue_get(char **blks, uint index) {
   return blks[index / 7] + (index % 7) * 8;
 }
 
+bool cmp2(char *a, char *b) {
+  uint i = atoi3(a);
+  uint j = atoi3(b);
+  return i < j;
+}
+
 void buffered_queue_sort(buffered_queue *self, int order_by) {
   char **blks = buffered_queue_blks(self);
   uint sz = buffered_queue_count(self);
   // simple bubble sort
-  for (uint i = 0; i < sz; i++) {
-    for (uint j = 0; j < sz; j++) {
-      char *a = buffered_queue_get(blks, i);
-      char *b = buffered_queue_get(blks, j);
+  for (uint i = 0; i < sz - 1; i++) {
+    for (uint j = 0; j < sz - 1 - i; j++) {
+      char *a = buffered_queue_get(blks, j);
+      char *b = buffered_queue_get(blks, j + 1);
       if (order_by == 0) {
-        if (CMP(a, b)) SWAP(a, b);
+        if (cmp2(a, b)) SWAP(a, b);
       } else {
-        if (CMP(a + 4, b + 4)) SWAP(a + 4, b + 4);
+        if (cmp2(a + 4, b + 4)) SWAP(a + 4, b + 4);
       }
     }
   }

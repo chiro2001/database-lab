@@ -10,8 +10,11 @@ int main() {
          "Buffer Initialization Failed!\n");
   Log("TEST: CMP");
   Assert(CMP("123", "456"), "CMP Failed!");
+  Assert(CMP("123", "124"), "CMP Failed!");
+  Assert(CMP("100", "101"), "CMP Failed!");
+  Assert(!CMP("100", "100"), "CMP Failed!");
   Log("TEST: buffered queue sort");
-  int queue_test_blk = 4;
+  int queue_test_blk = 1;
   buffered_queue *q = buffered_queue_init(queue_test_blk, -1, false);
   for (int i = 0; i < queue_test_blk * 7; i++) {
     buffered_queue_push(q, itot(100 + rand() % 100, 200 + rand() % 200));

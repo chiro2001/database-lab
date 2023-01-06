@@ -43,9 +43,9 @@ extern Buffer g_buf;
 #define min(a, b) ((a) < (b) ? (a) : (b))
 #define max(a, b) ((a) > (b) ? (a) : (b))
 
-#define CMP(a, b) (a)[0] < (b)[0] ? true : \
-                  (a)[1] < (b)[1] ? true : \
-                  (a)[2] < (b)[2]
+#define CMP(a, b) ((a)[0] < (b)[0] ? true : \
+                   (a)[1] < (b)[1] ? true : \
+                   (a)[2] < (b)[2])
 #define SWAP_(a, b) do { char t = (a); (a) = (b); (b) = t; } while (0)
 #define SWAP(a, b) do { SWAP_((a)[0], (b)[0]); SWAP_((a)[1], (b)[1]); SWAP_((a)[2], (b)[2]); } while (0)
 
