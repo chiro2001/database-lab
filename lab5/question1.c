@@ -3,6 +3,7 @@
 //
 #include "main_utils.h"
 #include "buffered_queue.h"
+#include "questions.h"
 
 void q1() {
   Log("=========================");
@@ -11,35 +12,16 @@ void q1() {
   Log("=========================");
 
   buffered_queue *q = buffered_queue_init(1, 100);
-  unsigned int block = 17;
-  while (block != 0) {
-    char *blk = NULL;
-    Dbg("loading block %d", block);
-    blk = readBlock(block);
-    for (int i = 0; i < 7; i++) {
-      if (SEQ("128", blk + i * 8)) {
-        Log("(%s, %s)", blk + i * 8, blk + i * 8 + 4);
-        buffered_queue_push(q, blk + i * 8);
-      }
-    }
-    block = atoi3(blk + 56);
-    freeBlock(blk);
-    if (block == 49) break;
-  }
+  int (*f)(int) = lambda(int, (int a){ return a + 1; });
+  Log("f(1) = %d", f(1));
+  data_iterate(17, 49, lambda(void, (char* c){
+      if (SEQ(c, "128")) buffered_queue_push(q, c);
+  }));
   buffered_queue_flush(q);
   free(q);
 
   Log("read results:");
-  block = 100;
-  while (block != 0) {
-    char *blk = NULL;
-    Dbg("loading block %d", block);
-    blk = readBlock(block);
-    for (int i = 0; i < 7; i++) {
-      if (*(blk + i * 8) != '\0')
-        Log("(%s, %s)", blk + i * 8, blk + i * 8 + 4);
-    }
-    block = atoi3(blk + 56);
-    freeBlock(blk);
-  }
+  data_iterate(100, -1, lambda(void, (char* c){
+      if (*c) Log("(%s, %s)", c, c + 4);
+  }));
 }

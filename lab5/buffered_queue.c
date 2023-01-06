@@ -85,7 +85,7 @@ void buffered_queue_push(buffered_queue *self, char *tuple) {
 void buffered_queue_flush(buffered_queue *self) {
   Log("buffered_queue_flush");
   buffered_queue_blk *tail = self->linked_blk;
-  while (tail->next != NULL) {
+  while (tail != NULL && tail->next != NULL) {
     tail = tail->next;
   }
   while (tail != NULL) {

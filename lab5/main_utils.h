@@ -14,10 +14,23 @@
 #define SEQ3(a, b) (SEQ2(a,b)&&((a)[2]==(b)[2]))
 #define SEQ(a, b) SEQ3(a, b)
 
-char *itoa(unsigned int i);
-unsigned int atoi3(char *s);
-char *readBlock(unsigned int addr);
+#define iter_handler(x) void (*(x))(char*)
+
+#define lambda( return_type, function_body) \
+  ({return_type lfunc function_body lfunc;})
+
+
+typedef uint uint;
+
+char *itoa(uint i);
+
+uint atoi3(char *s);
+
+char *readBlock(uint addr);
+
 void freeBlock(char *blk);
+
+void data_iterate(uint left, uint right, iter_handler(handler));
 
 extern Buffer buf;
 

@@ -9,7 +9,7 @@
 
 struct buffered_queue_blk {
   char *blk;
-  unsigned int addr;
+  uint addr;
   struct buffered_queue_blk *next;
   struct buffered_queue_blk *prev;
 };
@@ -18,7 +18,7 @@ typedef struct buffered_queue_blk buffered_queue_blk;
 typedef struct {
   Buffer *buffer;
   int total;
-  unsigned int addr;
+  uint addr;
   buffered_queue_blk *linked_blk;
   int size;
   size_t offset;
