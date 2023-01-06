@@ -12,16 +12,14 @@ void q1() {
   Log("=========================");
 
   buffered_queue *q = buffered_queue_init(1, 100);
-  int (*f)(int) = lambda(int, (int a){ return a + 1; });
-  Log("f(1) = %d", f(1));
-  data_iterate(17, 49, lambda(void, (char* c){
+  iterate_range(17, 49, lambda(void, (char* c){
       if (SEQ(c, "128")) buffered_queue_push(q, c);
   }));
   buffered_queue_flush(q);
   free(q);
 
   Log("read results:");
-  data_iterate(100, -1, lambda(void, (char* c){
+  iterate_range(100, -1, lambda(void, (char* c){
       if (*c) Log("(%s, %s)", c, c + 4);
   }));
 }

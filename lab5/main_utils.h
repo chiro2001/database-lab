@@ -30,8 +30,15 @@ char *readBlock(uint addr);
 
 void freeBlock(char *blk);
 
-void data_iterate(uint left, uint right, iter_handler(handler));
+void iterate_range(uint left, uint right, iter_handler(handler));
 
 extern Buffer buf;
+
+/// Some arguments
+#define BLK_SZ 64
+#define BLK 8
+
+#define min(a, b) ((a) < (b) ? (a) : (b))
+#define max(a, b) ((a) > (b) ? (a) : (b))
 
 #endif //LAB5_MAIN_UTILS_H

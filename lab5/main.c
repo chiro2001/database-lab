@@ -7,7 +7,8 @@
 int main() {
   Log("Lab5 program launched!");
 
-  Assert(initBuffer(520, 64, &buf), "Buffer Initialization Failed!\n");
+  Assert(initBuffer((BLK * (BLK_SZ + 1)), BLK_SZ, &buf),
+         "Buffer Initialization Failed!\n");
 
   Log("Table and data struct:");
   Log("R [A, B], block [1,  16]");
