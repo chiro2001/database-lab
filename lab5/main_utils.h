@@ -46,6 +46,8 @@ bool cmp2(char *a, char *b);
 
 void tuple_copy(char *dest, char *src);
 
+char *block_tuple_tail(char *blk);
+
 extern Buffer g_buf;
 
 /// Some arguments

@@ -85,3 +85,11 @@ void iterate_range(uint left, uint right, iter_handler(handler)) {
     if (block == right) break;
   }
 }
+
+char *block_tuple_tail(char *blk) {
+  for (int i = 0; i < 7; i++) {
+    if (*(blk + 8) == '\0') return blk;
+    blk += 8;
+  }
+  return NULL;
+}
