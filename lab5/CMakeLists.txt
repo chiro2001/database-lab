@@ -39,7 +39,7 @@ target_compile_definitions(debug_macros INTERFACE
 )
 
 include_directories(${CMAKE_SOURCE_DIR})
-add_executable(lab5 extmem.c main.c)
+add_executable(lab5 extmem.c main.c buffered_queue.c buffered_queue.h main_utils.h main_utils.c)
 add_executable(mem_test extmem.c test.c)
 
 #target_compile_options(lab5 INTERFACE Og)

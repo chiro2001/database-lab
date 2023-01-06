@@ -1,128 +1,8 @@
 //
 // Created by chiro on 22-12-29.
 //
-#include <stdio.h>
-#include <stdlib.h>
-#include <debug_macros.h>
-#include "extmem.h"
-
-#define SEQ2(a, b) (((a)[0]==(b)[0])&&((a)[1]==(b)[1]))
-#define SEQ3(a, b) (SEQ2(a,b)&&((a)[2]==(b)[2]))
-#define SEQ(a, b) SEQ3(a, b)
-
-Buffer buf;
-
-char *readBlock(unsigned int addr) {
-  char *blk = NULL;
-  Assert(NULL != (blk = (char *) readBlockFromDisk(addr, &buf)), "Reading Block %u Failed", addr);
-  return blk;
-}
-
-void freeBlock(char *blk) {
-  freeBlockInBuffer((unsigned char *) blk, &buf);
-}
-
-char *itoa(unsigned int i) {
-  static char itoa_buffer[5];
-  sprintf(itoa_buffer, "%d", i);
-  return itoa_buffer;
-}
-
-struct buffered_queue_blk {
-  char *blk;
-  unsigned int addr;
-  struct buffered_queue_blk *next;
-  struct buffered_queue_blk *prev;
-};
-typedef struct buffered_queue_blk buffered_queue_blk;
-
-typedef struct {
-  Buffer *buffer;
-  int total;
-  unsigned int addr;
-  buffered_queue_blk *linked_blk;
-  int size;
-  size_t offset;
-} buffered_queue;
-
-buffered_queue *buffered_queue_init(int sz, unsigned addr) {
-  buffered_queue *q = malloc(sizeof(buffered_queue));
-  memset(q, 0, sizeof(buffered_queue));
-  q->buffer = &buf;
-  q->addr = addr;
-  q->total = sz;
-  return q;
-}
-
-void buffered_queue_push(buffered_queue *self, char *tuple) {
-  Log("queue push (%s, %s)", tuple, tuple + 4);
-  if (self->linked_blk == NULL) {
-    Log("init linked blocks, sizeof(buffered_queue_blk) = %lu", sizeof(buffered_queue_blk));
-    self->linked_blk = malloc(sizeof(buffered_queue_blk));
-    self->linked_blk->blk = (char *) getNewBlockInBuffer(self->buffer);
-    self->linked_blk->next = NULL;
-    self->linked_blk->prev = NULL;
-    self->linked_blk->addr = self->addr;
-  }
-  if (self->offset == 56) {
-    // fill in next addr in this block
-    strcpy(self->linked_blk->blk + self->offset, itoa(++self->addr));
-    self->offset = 0;
-    if (self->size == self->total - 1) {
-      buffered_queue_blk *tail = self->linked_blk;
-      while (tail->next != NULL) {
-        tail = tail->next;
-      }
-      buffered_queue_blk *prev = tail->prev;
-      if (prev != NULL) {
-        prev->next = NULL;
-      } else {
-        self->linked_blk = malloc(sizeof(buffered_queue_blk));
-        self->linked_blk->blk = (char *) getNewBlockInBuffer(self->buffer);
-        self->linked_blk->next = NULL;
-        self->linked_blk->prev = NULL;
-        self->linked_blk->addr = self->addr;
-      }
-      Log("queue full, write block %d", tail->addr);
-      writeBlockToDisk((unsigned char *) tail->blk, tail->addr, self->buffer);
-      free(tail);
-    } else {
-      self->size++;
-    }
-    // allocate one buffer, insert to link head
-    Log("new buffer for block %d", self->addr);
-    char *blk = (char *) getNewBlockInBuffer(self->buffer);
-    memset(blk, 0, 64);
-    buffered_queue_blk *n = malloc(sizeof(buffered_queue_blk));
-    Log("n=%p, self->linked_blk=%p", n, self->linked_blk);
-    Assert(n != self->linked_blk, "n == self->linked_blk == %p", n);
-    n->addr = self->addr;
-    n->blk = blk;
-    n->next = self->linked_blk;
-    n->prev = NULL;
-    self->linked_blk->prev = n;
-    self->linked_blk = n;
-  }
-  memcpy(self->linked_blk->blk + self->offset, tuple, 8);
-  self->offset += 8;
-}
-
-void buffered_queue_flush(buffered_queue *self) {
-  Log("buffered_queue_flush");
-  buffered_queue_blk *tail = self->linked_blk;
-  while (tail->next != NULL) {
-    tail = tail->next;
-  }
-  while (tail != NULL) {
-    writeBlockToDisk((unsigned char *) tail->blk, tail->addr, self->buffer);
-    buffered_queue_blk *r = tail;
-    tail = tail->prev;
-    free(r);
-  }
-  self->size = 0;
-  self->linked_blk = NULL;
-  self->offset = 0;
-}
+#include "main_utils.h"
+#include "buffered_queue.h"
 
 int main() {
   Log("Lab5 program launched!");
@@ -149,7 +29,8 @@ int main() {
         buffered_queue_push(q, blk + i * 8);
       }
     }
-    block = atoi(blk + 56);
+    Log("next block: %s", blk + 56);
+    block = atoi3(blk + 56);
     freeBlock(blk);
     if (block == 49) break;
   }
@@ -166,11 +47,16 @@ int main() {
       if (*(blk + i * 8) != '\0')
         Log("(%s, %s)", blk + i * 8, blk + i * 8 + 4);
     }
-    block = atoi(blk + 56);
+    block = atoi3(blk + 56);
     freeBlock(blk);
   }
 
   freeBuffer(&buf);
+
+  Log("=========================");
+  Log("两阶段多路归并排序算法(TPMMS)");
+  Log("利用内存缓冲区将关系 R 和 S 分别排序,并将排序后的结果存放在磁盘上。");
+  Log("=========================");
 
   return 0;
 }
