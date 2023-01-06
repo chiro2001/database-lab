@@ -31,7 +31,7 @@ uint atoi3(const char *s) {
 bool cmp2(char *a, char *b) {
   uint i = atoi3(a);
   uint j = atoi3(b);
-  return i < j;
+  return i > j;
 }
 
 void tuple_copy(char *dest, char *src) {

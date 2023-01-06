@@ -12,8 +12,10 @@ char *iterator_next(iterator *it) {
       it->blk = NULL;
       return NULL;
     } else {
+      Dbg("iterator load new block: %d", it->now + 1);
       it->blk = readBlock(++it->now);
       it->offset = 0;
+      return iterator_now(it);
     }
   }
   char *r = iterator_now(it);
@@ -22,7 +24,10 @@ char *iterator_next(iterator *it) {
 }
 
 char *iterator_now(iterator *it) {
-  if (it->offset == 56 && it->now >= it->end - 1) return NULL;
+  // Log("iterator [begin now end] offset: [%d %d %d] %d", it->begin, it->now, it->end, it->offset);
+  if (it->offset == 56) {
+    return iterator_next(it);
+  }
   return it->blk + it->offset;
 }
 
