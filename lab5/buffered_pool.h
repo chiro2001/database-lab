@@ -35,4 +35,6 @@ void buffered_pool_kick(buffered_pool *self);
 
 char *buffered_pool_read(buffered_pool *self, uint addr);
 
+void buffered_pool_free(buffered_pool *self);
+
 #endif //LAB5_BUFFERED_POOL_H

@@ -23,6 +23,7 @@ buffered_pool_pair *buffered_pool_find(buffered_pool *self, uint addr) {
 }
 
 void buffered_pool_insert(buffered_pool *self, uint addr) {
+  Log("buffered_pool_insert(%d)", addr);
   self->pool = realloc(self->pool, ++self->size);
   self->pool[self->size - 1].addr = addr;
   self->pool[self->size - 1].blk = read_block(addr);
@@ -60,7 +61,7 @@ void buffered_pool_kick(buffered_pool *self) {
   int index = -1;
   for (uint i = 0; i < self->size; i++) {
     if (self->pool[i].visit < oldest) {
-      index = (int)i;
+      index = (int) i;
       oldest = self->pool[i].visit;
     }
   }
@@ -80,4 +81,9 @@ char *buffered_pool_read(buffered_pool *self, uint addr) {
   target = buffered_pool_find(self, addr);
   Assert(target != NULL, "pool insert failed!");
   return target->blk;
+}
+
+void buffered_pool_free(buffered_pool *self) {
+  free(self->pool);
+  free(self);
 }

@@ -3,11 +3,11 @@
 //
 #include "main_utils.h"
 #include "buffered_queue.h"
+#include "buffered_pool.h"
 
 int main() {
   srand(time(NULL));
-  Assert(initBuffer((BLK * (BLK_SZ + 1)), BLK_SZ, &g_buf),
-         "Buffer Initialization Failed!\n");
+  buffer_init();
   Log("TEST: CMP");
   Assert(CMP("123", "456"), "CMP Failed!");
   Assert(CMP("123", "124"), "CMP Failed!");
@@ -32,5 +32,20 @@ int main() {
   Assert(atoi3("303") == 303, "atoi3 error, return value: %d", atoi3("303"));
   Assert(atoi3("0") == 0, "atoi3 err");
   Assert(atoi3("40") == 40, "atoi3 err");
+
+  buffer_free();
+  buffer_init();
+  Log("TEST: buffered pool");
+  read_block(1);
+  read_block(2);
+  buffered_pool *p = buffered_pool_init(2);
+  for (int addr = 1; addr < 49; addr++) {
+    Assert(buffered_pool_read(p, addr) != NULL, "pool read err, addr: %d", addr);
+  }
+  for (int i = 0; i < 500; i++) {
+    Assert(buffered_pool_read(p, (rand() % 48) + 1) != NULL, "pool read err, addr: %d", i);
+  }
+  buffered_pool_free(p);
+  buffer_free();
   return 0;
 }
