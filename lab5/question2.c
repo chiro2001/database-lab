@@ -8,14 +8,21 @@
 
 void TPMMS_sort_subset(uint left, uint right, uint target, bool continuous) {
   buffered_queue *q = buffered_queue_init(BLK, target, false);
+  Log("TPMMS_sort_subset(%d, %d, %d), data subset before:", left, right, target);
+  iterate_range_show(left, right);
   // load one subset
   for (uint addr = left; addr < right; addr++)
     buffered_queue_push_blk(q, addr, continuous);
   // sort in this subset
+  Log("data subset in queue before:");
+  buffered_queue_show(q);
   buffered_queue_sort(q, 0);
+  Log("data subset in queue after:");
+  buffered_queue_show(q);
   q->flushable = true;
   buffered_queue_flush(q);
   buffered_queue_free(q);
+  // iterate_range_show(target, target);
 }
 
 void TPMMS_sort_subsets(uint left, uint right, uint target) {
@@ -33,24 +40,26 @@ void TPMMS_sort_subsets(uint left, uint right, uint target) {
 
 iterator *TPMM_reader_select(iterator *readers[BLK - 1]) {
   iterator *r = NULL;
-  int s = 0;
   char smallest[9] = "";
   for (int i = 0; i < BLK - 1; i++) {
     if (readers[i] == NULL) continue;
     char *now = iterator_now(readers[i]);
     if (now == NULL) continue;
+    Dbg("reader selecting data: (%s, %s)", now, now + 4);
     if (smallest[0] == '\0') {
       tuple_copy(smallest, now);
       r = readers[i];
-      s = i;
     } else {
       if (cmp_greater(smallest, now)) {
         tuple_copy(smallest, now);
         r = readers[i];
-        s = i;
       }
     }
   }
+  char *now = r == NULL ? NULL : iterator_now(r);
+  if (now != NULL)
+    Dbg("reader selected: (%s, %s)", now, now + 4);
+  else Dbg("reader selected: None");
   return r;
 }
 
@@ -74,7 +83,7 @@ void TPMMS_merge_sort(uint left, uint right, uint target) {
 }
 
 void TPMMS(uint left, uint right, uint target) {
-  uint temp = target + 100;
+  uint temp = target + 1000;
   TPMMS_sort_subsets(left, right, temp);
   TPMMS_merge_sort(temp, temp + (right - left), target);
 }

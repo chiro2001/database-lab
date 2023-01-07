@@ -96,7 +96,7 @@ void buffered_queue_push(buffered_queue *self, char *tuple) {
  * @param addr
  */
 void buffered_queue_push_blk(buffered_queue *self, uint addr, bool continuous) {
-  Dbg("buffered_queue_push_blk(%d)", addr);
+  Log("buffered_queue_push_blk(%d), offset=%zu", addr, self->offset);
   Assert(self->offset == 0 || self->offset == 56,
          "insert blk, offset must == 0 | 56");
   char *blk = read_block(addr);
@@ -104,7 +104,7 @@ void buffered_queue_push_blk(buffered_queue *self, uint addr, bool continuous) {
   // to support other inserts
   // self->offset = 56;
   buffered_queue_set_next_addr(self, continuous);
-  Dbg("write next addr for block [%d]: %s", self->linked_blk->addr, self->linked_blk->blk + 56);
+  Log("write next addr for block [%d]: %s", self->linked_blk->addr, self->linked_blk->blk + 56);
   self->size++;
 }
 
