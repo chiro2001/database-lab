@@ -15,10 +15,23 @@ char *iterator_next(iterator *it) {
       it->blk = NULL;
       return NULL;
     } else {
-      Dbg("iterator load new block: %d", it->now + 1);
-      it->blk = it->ca ? cache_read(it->ca, ++it->now) : read_block(++it->now);
-      it->offset = 0;
-      return iterator_now(it);
+      if (it->end == -1) {
+        Assert(it->ca == NULL, "not implemented");
+        Dbg("iterator load new block: %d", it->now + 1);
+        it->blk = read_block_try(++it->now);
+        if (it->blk == NULL) {
+          Assert(g_buf.numFreeBlk > 0, "must caused by not found address");
+          return NULL;
+        } else {
+          it->offset = 0;
+          return iterator_now(it);
+        }
+      } else {
+        Dbg("iterator load new block: %d", it->now + 1);
+        it->blk = it->ca ? cache_read(it->ca, ++it->now) : read_block(++it->now);
+        it->offset = 0;
+        return iterator_now(it);
+      }
     }
   }
   char *r = iterator_now(it);

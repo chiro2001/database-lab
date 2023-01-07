@@ -38,6 +38,8 @@ void buffer_report();
 
 char *read_block(uint addr);
 
+char *read_block_try(uint addr);
+
 char *allocBlock();
 
 void free_block(char *blk);

@@ -83,7 +83,7 @@ void TPMMS_merge_sort(uint left, uint right, uint target) {
 }
 
 void TPMMS(uint left, uint right, uint target) {
-  uint temp = target + 1000;
+  uint temp = 400;
   TPMMS_sort_subsets(left, right, temp);
   TPMMS_merge_sort(temp, temp + (right - left), target);
 }

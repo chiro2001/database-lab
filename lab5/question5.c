@@ -4,6 +4,7 @@
 #include "main_utils.h"
 #include "buffered_queue.h"
 #include "questions.h"
+#include "iterator.h"
 
 void range_sorted_deduplication(uint left, uint right, uint target) {
   buffered_queue *q = buffered_queue_init(1, target, true);
@@ -59,13 +60,56 @@ void deduplication_merge_subsets(uint left, uint right, uint target) {
   buffered_queue_free(q);
 }
 
-void deduplication_two_stage_scanning(uint left, uint right, uint target) {
+void sort_deduplication_two_stage_scanning(uint left, uint right, uint target) {
   uint blk_total = right - left;
-  uint temp1 = target + 2000;
+  uint temp1 = 400;
   TPMMS_sort_subsets(left, right, temp1);
-  uint temp2 = target + 3000;
+  Log("sorted subsets:");
+  iterate_range_show(temp1, temp1 + blk_total);
+  uint temp2 = 500;
   deduplication_subsets(temp1, temp1 + blk_total, temp2);
+  Log("deduplication subsets:");
+  iterate_range_show(temp2, temp2 + blk_total);
   deduplication_merge_subsets(temp2, temp2 + blk_total, target);
+  Log("merged deduplication:");
+  iterate_range_show(target, -1);
+}
+
+void union_two_stage_scanning(uint first, uint second, uint target) {
+  buffered_queue *q = buffered_queue_init(1, target, true);
+  iterator *reader_first = iterator_init(first, -1, NULL);
+  iterator *reader_second = iterator_init(first, -1, NULL);
+  char *last_insert = malloc(sizeof(char) * 9);
+  *last_insert = '\0';
+  char *a = NULL;
+  char *b = NULL;
+  while (true) {
+    a = iterator_now(reader_first);
+    b = iterator_now(reader_second);
+    if (a == NULL || b == NULL) break;
+    if (cmp_greater(a, b)) {
+      if (!SEQ_T(b, last_insert)) {
+        buffered_queue_push(q, b);
+        tuple_copy(last_insert, b);
+      }
+      iterator_next(reader_second);
+    } else {
+      if (!SEQ_T(a, last_insert)) {
+        buffered_queue_push(q, a);
+        tuple_copy(last_insert, a);
+      }
+      iterator_next(reader_first);
+    }
+  }
+  while (a == NULL && b != NULL) {
+    buffered_queue_push(q, b);
+    b = iterator_next(reader_second);
+  }
+  while (a != NULL && b == NULL) {
+    buffered_queue_push(q, a);
+    a = iterator_next(reader_first);
+  }
+  buffered_queue_flush(q);
 }
 
 void q5() {
@@ -74,10 +118,11 @@ void q5() {
   Log("实现 S U R");
   Log("==================");
   buffer_init();
-  TPMMS(1, 17, 301);
-  TPMMS(17, 49, 317);
+  sort_deduplication_two_stage_scanning(1, 17, 500);
+  sort_deduplication_two_stage_scanning(17, 49, 600);
+  union_two_stage_scanning(500, 600, 700);
 
-  // union_two_stage_scanning()
+  iterate_range_show(700, -1);
 
   buffer_report();
   buffer_free();

@@ -59,8 +59,13 @@ void buffer_report() {
 
 char *read_block(uint addr) {
   char *blk = NULL;
-  Assert(NULL != (blk = (char *) readBlockFromDisk(addr, &g_buf)), "Reading Block %u Failed", addr);
+  Assert(NULL != (blk = (char *) readBlockFromDisk(addr, &g_buf)),
+         "Reading Block %u Failed, free blocks in buf: %zu", addr, g_buf.numFreeBlk);
   return blk;
+}
+
+char *read_block_try(uint addr) {
+  return (char *) readBlockFromDisk(addr, &g_buf);
 }
 
 char *allocBlock() {

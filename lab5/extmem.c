@@ -9,6 +9,7 @@
 #include <stdio.h>
 #include <string.h>
 #include "extmem.h"
+#include "debug_macros.h"
 
 Buffer *initBuffer(size_t bufSize, size_t blkSize, Buffer *buf) {
   int i;
@@ -96,7 +97,8 @@ unsigned char *readBlockFromDisk(unsigned int addr, Buffer *buf) {
   FILE *fp = fopen(filename, "r");
 
   if (!fp) {
-    perror("Reading Block Failed!\n");
+    Err("Reading Block %d Failed!", addr);
+    // perror("Reading Block Failed!\n");
     return NULL;
   }
 
