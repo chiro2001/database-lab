@@ -37,6 +37,8 @@ void buffered_queue_free(buffered_queue *self);
 
 void buffered_queue_iterate(buffered_queue *self, iter_handler(handler));
 
+void buffered_queue_show(buffered_queue *self);
+
 void buffered_queue_sort(buffered_queue *self, int order_by);
 
 uint buffered_queue_count(buffered_queue *self);

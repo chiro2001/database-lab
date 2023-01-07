@@ -43,6 +43,8 @@ void free_block(char *blk);
 
 void iterate_range(uint left, uint right, iter_handler(handler));
 
+void iterate_range_show(uint left, uint right);
+
 bool cmp_greater(char *a, char *b);
 
 void tuple_copy(char *dest, char *src);

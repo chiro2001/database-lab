@@ -38,10 +38,7 @@ void q1() {
 
   Log("满足选择条件的元组一共 %d 个", count);
   buffered_queue_sort(q, 1);
-  buffered_queue_iterate(q, lambda(bool, (char *s) {
-      Log("# (%s, %s)", s, s + 4);
-      return true;
-  }));
+  buffered_queue_show(q);
   buffered_queue_free(q);
   buffer_report();
   buffer_free();

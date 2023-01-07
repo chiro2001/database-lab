@@ -66,8 +66,6 @@ void indexed_select_binary_search(uint left, uint right, uint key, buffered_queu
 
 void indexed_select_linear(uint left, uint right, uint key, buffered_queue *target) {
   Log("indexed_select_linear(%d, %d, key=%d)", left, right, key);
-  // uint addr_last = -1;
-  // bool addr_last_done = false;
   uint addrs[BLK] = {0};
   uint *addrs_pointer = addrs;
   bool addrs_ok = false;
@@ -78,14 +76,8 @@ void indexed_select_linear(uint left, uint right, uint key, buffered_queue *targ
       uint k = atoi3(s);
       uint addr = atoi3(s + 4);
       if (k >= key && !addrs_ok) {
-        // if (addr_last != -1 && !addr_last_done) {
-        //   Log("select addr %d", addr_last);
-        //   *(addrs_pointer++) = addr_last;
-        //   addr_last_done = true;
-        // }
         Log("select addr %d", addr);
         *(addrs_pointer++) = addr;
-        // addr_last = addr;
       }
       if (k > key) {
         addrs_ok = true;
@@ -136,7 +128,7 @@ void q3() {
   q = buffered_queue_init(4, -1, false);
   iterate_range(600, -1, lambda(bool, (char *s) {
     if (*s != NULL) {
-      Log("-> (%s, %s)", s, s + 4);
+      // Log("-> (%s, %s)", s, s + 4);
       buffered_queue_push(q, s);
       count++;
     }
@@ -144,10 +136,7 @@ void q3() {
   }));
   Log("满足选择条件的元组一共 %d 个", count);
   buffered_queue_sort(q, 1);
-  buffered_queue_iterate(q, lambda(bool, (char *s) {
-    Log("# (%s, %s)", s, s + 4);
-    return true;
-  }));
+  buffered_queue_show(q);
   buffered_queue_free(q);
   buffer_report();
   buffer_free();

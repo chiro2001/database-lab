@@ -87,6 +87,10 @@ void q2() {
   buffer_init();
   TPMMS(1, 17, 301);
   TPMMS(17, 49, 317);
+  Log("R after sort:");
+  iterate_range_show(301, 317);
+  Log("S after sort:");
+  iterate_range_show(317, -1);
   buffer_report();
   buffer_free();
 }

@@ -157,6 +157,23 @@ void buffered_queue_iterate(buffered_queue *self, iter_handler(handler)) {
   }
 }
 
+void buffered_queue_show(buffered_queue *self) {
+  printf("======== data in queue (total=%d, size=%d, offset/8=%zu, addr=%d)\n",
+         self->total, self->size, self->offset / 8, self->addr);
+  uint cnt = 0;
+  buffered_queue_iterate(self, lambda(bool, (char *s) {
+    if (*s != '\0') {
+      printf("(%s, %s) ", s, s + 4);
+      if ((cnt++) == 7) {
+        puts("");
+        cnt = 0;
+      }
+    }
+    return true;
+  }));
+  if (cnt != 0) puts("");
+}
+
 uint buffered_queue_count(buffered_queue *self) {
   return self->size * 7 + (self->offset) / 8;
 }
