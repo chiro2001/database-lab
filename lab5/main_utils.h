@@ -63,5 +63,6 @@ extern Buffer g_buf;
                    (a)[2] < (b)[2])
 #define SWAP_(a, b) do { char t = (a); (a) = (b); (b) = t; } while (0)
 #define SWAP(a, b) do { SWAP_((a)[0], (b)[0]); SWAP_((a)[1], (b)[1]); SWAP_((a)[2], (b)[2]); } while (0)
+#define SWAP_U(a, b) do { uint t = (a); (a) = (b); (b) = t; } while (0)
 
 #endif //LAB5_MAIN_UTILS_H
