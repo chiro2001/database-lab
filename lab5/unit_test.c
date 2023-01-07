@@ -45,5 +45,15 @@ int main() {
   }
   cache_free(p);
   buffer_free();
+
+  buffer_init();
+  // Log("TEST: sort merge join");
+  // int r[] = {20, 30, 30, 30, 31, 33, 35, 0};
+  // int s[] = {21, 22, 30, 30, 32, 43, 45, 0};
+  // int res[20] = {0};
+  // int *p_w = res;
+  // int *p_r = r;
+  // int *p_s = s;
+  buffer_free();
   return 0;
 }

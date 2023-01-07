@@ -41,18 +41,6 @@ void cache_remove_index(cache *self, int index) {
   cache_pair *target = &self->data[index];
   if (target == NULL) return;
   free_block(target->blk);
-  // cache_pair *cache_new = malloc(sizeof(cache_pair) * (self->total));
-  // memset(cache_new, 0, sizeof(cache) * (self->total));
-  // cache_pair *cache_tail = cache_new;
-  // for (int i = 0; i < self->size; i++)
-  //   if (i != index) {
-  //     cache_tail->addr = self->cache[i].addr;
-  //     cache_tail->blk = self->cache[i].blk;
-  //     cache_tail++;
-  //   }
-  // free(self->cache);
-  // self->cache = cache_new;
-
   // move last item to target place
   memcpy(self->data + self->size, target, sizeof(cache_pair));
   self->size--;

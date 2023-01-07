@@ -44,7 +44,7 @@ iterator *TPMM_reader_select(iterator *readers[BLK - 1]) {
       r = readers[i];
       s = i;
     } else {
-      if (cmp2(smallest, now)) {
+      if (cmp_greater(smallest, now)) {
         tuple_copy(smallest, now);
         r = readers[i];
         s = i;

@@ -190,9 +190,9 @@ void buffered_queue_sort(buffered_queue *self, int order_by) {
       char *a = buffered_queue_get(blks, j);
       char *b = buffered_queue_get(blks, j + 1);
       if (order_by == 0) {
-        if (cmp2(a, b)) SWAP(a, b);
+        if (cmp_greater(a, b)) SWAP(a, b);
       } else {
-        if (cmp2(a + 4, b + 4)) SWAP(a + 4, b + 4);
+        if (cmp_greater(a + 4, b + 4)) SWAP(a + 4, b + 4);
       }
     }
   }

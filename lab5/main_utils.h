@@ -42,7 +42,7 @@ void free_block(char *blk);
 
 void iterate_range(uint left, uint right, iter_handler(handler));
 
-bool cmp2(char *a, char *b);
+bool cmp_greater(char *a, char *b);
 
 void tuple_copy(char *dest, char *src);
 

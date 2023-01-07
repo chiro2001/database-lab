@@ -3,6 +3,7 @@
 //
 
 #include "main_utils.h"
+#include "cache.h"
 
 char *itoa(uint i) {
   static char itoa_buffer[5];
@@ -28,7 +29,7 @@ uint atoi3(const char *s) {
   return a * 100 + b * 10 + c;
 }
 
-bool cmp2(char *a, char *b) {
+bool cmp_greater(char *a, char *b) {
   uint i = atoi3(a);
   uint j = atoi3(b);
   return i > j;
