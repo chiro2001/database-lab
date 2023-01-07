@@ -146,27 +146,6 @@ void union_SUR(uint s_left, uint s_right, uint r_left, uint r_right, uint target
   union_two_stage_scanning(
       temp1, temp1 + (s_right - s_left) - skipped_s / 7,
       temp2, temp2 + (r_right - r_left) - skipped_r / 7, target);
-
-  // uint skipped = skipped_s + skipped_r;
-  // uint temp3 = 300;
-  // // sort_deduplicate_two_stage_scanning(temp1, s_right, temp1);
-  // buffered_queue *q = buffered_queue_init(1, temp3, true);
-  // iterate_range(temp1, -1, lambda(bool, (char *s) {
-  //   if (*s != '\0') {
-  //     buffered_queue_push(q, s);
-  //   }
-  //   return *s != '\0';
-  // }));
-  // iterate_range(temp2, -1, lambda(bool, (char *s) {
-  //     if (*s != '\0') {
-  //     buffered_queue_push(q, s);
-  // }
-  //     return *s != '\0';
-  // }));
-  // buffered_queue_flush(q);
-  // buffered_queue_free(q);
-  // uint total = (s_right - s_left) + (r_right - r_left);
-  // sort_deduplicate_two_stage_scanning(temp3, temp3 + total - (skipped / 7), target);
 }
 
 void q5() {
@@ -181,16 +160,16 @@ void q5() {
   union_SUR(1, 17, 17, 49, target);
 
   buffered_queue *q = buffered_queue_init(64, -1, false);
-  // iterate_range_show(target, -1);
-  iterate_range(target, -1, lambda(bool, (char *s) {
-    if (*s != '\0') {
-      // Log("pusing (%s, %s)", s, s + 4);
-      buffered_queue_push(q, s);
-    }
-    return *s != '\0';
-  }));
-  buffered_queue_show(q);
-  buffered_queue_free(q);
+  iterate_range_show(target, -1);
+  // iterate_range(target, -1, lambda(bool, (char *s) {
+  //   if (*s != '\0') {
+  //     // Log("pusing (%s, %s)", s, s + 4);
+  //     buffered_queue_push(q, s);
+  //   }
+  //   return *s != '\0';
+  // }));
+  // buffered_queue_show(q);
+  // buffered_queue_free(q);
 
   buffer_report();
   buffer_free();

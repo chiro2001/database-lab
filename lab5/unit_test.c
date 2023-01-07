@@ -243,7 +243,7 @@ int main() {
   buffer_free();
 
   buffer_init();
-  Log("TEST: two stream union");
+
 
   buffer_free();
   return 0;
