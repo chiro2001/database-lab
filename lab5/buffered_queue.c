@@ -210,7 +210,7 @@ void buffered_queue_sort(buffered_queue *self, int order_by) {
       if (order_by == 0) {
         if (cmp_greater(a, b)) SWAP(a, b);
       } else {
-        if (cmp_greater(a + 4, b + 4)) SWAP(a + 4, b + 4);
+        if (cmp_greater(a + 4, b + 4)) SWAP(a, b);
       }
     }
   }

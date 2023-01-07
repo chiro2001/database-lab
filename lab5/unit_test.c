@@ -163,9 +163,9 @@ int main() {
   for (tuple *i = data->s; i->a; i++) {
     if (i->a == 128) {
       char *it = itot(i->a, i->b);
-      // Log("... (%s, %s)", it, it + 4);
       char *ss = malloc(sizeof(char) * 9);
       tuple_copy(ss, it);
+      // Log("... (%s, %s)", ss, ss + 4);
       buffered_queue_push(q, ss);
     }
   }
