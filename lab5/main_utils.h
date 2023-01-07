@@ -15,6 +15,7 @@
 #define SEQ(a, b) SEQ3(a, b)
 
 #define iter_handler(x) bool (*(x))(char*)
+#define handle_iter(x) (bool (*)(char*))(x)
 
 #define lambda(return_type, function_body) \
   ({return_type lfunc function_body lfunc;})

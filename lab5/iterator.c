@@ -35,7 +35,7 @@ char *iterator_now(iterator *it) {
 }
 
 iterator *iterator_init(uint begin, uint end, cache *ca) {
-  Log("iterator_init(%d, %d)", begin, end);
+  Dbg("iterator_init(%d, %d)", begin, end);
   iterator *it = malloc(sizeof(iterator));
   memset(it, 0, sizeof(iterator));
   it->begin = begin;

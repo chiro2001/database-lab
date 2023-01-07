@@ -72,7 +72,7 @@ void free_block(char *blk) {
 }
 
 void iterate_range(uint left, uint right, iter_handler(handler)) {
-  Log("iterate_range(%d, %d)", left, right);
+  Dbg("iterate_range(%d, %d)", left, right);
   uint block = left;
   while (block != 0) {
     char *blk = NULL;

@@ -5,6 +5,46 @@
 #include "buffered_queue.h"
 #include "cache.h"
 
+#define DATA_SZ_MAX 512
+
+typedef struct {
+  uint a, b;
+} tuple;
+
+typedef struct {
+  tuple *r, *s;
+} data_mem;
+
+tuple *load_range(uint left, uint right) {
+  tuple *list = malloc(sizeof(tuple) * DATA_SZ_MAX);
+  memset(list, 0, sizeof(tuple) * DATA_SZ_MAX);
+  tuple *p = list;
+  iterate_range(left, right, lambda(bool, (char *s) {
+    if (*s) {
+      p->a = atoi3(s);
+      p->b = atoi3(s + 4);
+      p++;
+    }
+    return true;
+  }));
+  return list;
+}
+
+void tuple_list_append(tuple *dest, tuple *src) {
+  tuple *p = src;
+  while (p->a > 0) p++;
+  memcpy(dest, src, p - src);
+}
+
+data_mem *load_all() {
+  tuple r_range = {1, 17};
+  tuple s_range = {17, 48};
+  data_mem *d = malloc(sizeof(data_mem));
+  d->r = load_range(r_range.a, r_range.b);
+  d->s = load_range(r_range.a, r_range.b);
+  return d;
+}
+
 int main() {
   srand(time(NULL));
   buffer_init();
@@ -77,6 +117,17 @@ int main() {
   }
   for (int *pp = res; *pp; pp += 2) {
     printf("(%d, %d) ", *pp, *(pp + 1));
+  }
+
+  Log("TEST: load data");
+  data_mem *data = load_all();
+  for (tuple *i = data->r; i->a; i++) {
+    Log("(%d, %d)", i->a, i->b);
+  }
+  Log("TEST: Q1/3 select S.C, S.D from S where S.C = 128");
+  for (tuple *i = data->s; i->a; i++) {
+    if (i->a == 128)
+      Log("(%d, %d)", i->a, i->b);
   }
   buffer_free();
   return 0;

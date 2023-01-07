@@ -127,6 +127,15 @@ void q3() {
   indexed_select_linear(517, 520, 128, q);
   buffered_queue_flush(q);
   buffered_queue_free(q);
+  uint count = 0;
+  iterate_range(600, -1, lambda(bool, (char *s) {
+    if (*s != NULL) {
+      Log("-> (%s, %s)", s, s + 4);
+      count++;
+    }
+    return true;
+  }));
+  Log("满足选择条件的元组一共 %d 个", count);
   buffer_report();
   buffer_free();
 }

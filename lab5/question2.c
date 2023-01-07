@@ -19,7 +19,7 @@ void TPMMS_sort_subset(uint left, uint right, uint target, bool continuous) {
 }
 
 void TPMMS_sort_subsets(uint left, uint right, uint target) {
-  Log("TPMMS_sort_subsets");
+  Dbg("TPMMS_sort_subsets");
   uint blk_total = right - left;
   uint rounds = blk_total / BLK +
                 ((blk_total % BLK) == 0 ? 0 : 1);
@@ -55,7 +55,7 @@ iterator *TPMM_reader_select(iterator *readers[BLK - 1]) {
 }
 
 void TPMMS_merge_sort(uint left, uint right, uint target) {
-  Log("TPMMS_merge_sort");
+  Dbg("TPMMS_merge_sort");
   uint blk_total = right - left;
   uint reader_count = blk_total / BLK +
                       ((blk_total % BLK) == 0 ? 0 : 1);
