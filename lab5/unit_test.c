@@ -11,6 +11,8 @@ typedef struct {
   uint a, b;
 } tuple;
 
+#define SWAP_TUPLE(a, b) do { tuple t = (a); (a) = (b); (b) = t; } while (0)
+
 typedef struct {
   tuple *r, *s;
 } data_mem;
@@ -22,12 +24,12 @@ tuple *load_range(uint left, uint right) {
   memset(list, 0, tuple_sz_max);
   tuple *p = list;
   iterate_range(left, right, lambda(bool, (char *s) {
-    if (*s) {
+      if (*s) {
       p->a = atoi3(s);
       p->b = atoi3(s + 4);
       p++;
-    }
-    return true;
+  }
+      return true;
   }));
   return list;
 }
@@ -41,20 +43,33 @@ data_mem *data_clone(data_mem *src) {
   return d;
 }
 
-void tuple_sort(tuple *l, uint order_by) {
-  for (uint i = 0; i < tuple_sz_max - 1; i++) {
-    for (uint j = 0; j < tuple_sz_max - 1 - i; j++) {
+void tuple_sort(tuple *l, uint sz, uint order_by) {
+  for (uint i = 0; i < sz - 1; i++) {
+    for (uint j = 0; j < sz - 1 - i; j++) {
       tuple *n = l + j;
       tuple *m = l + j + 1;
-      if (order_by == 0) { if (n->a > m->a) SWAP_U(n->a, m->a); }
-      else { if (n->b > m->b) SWAP_U(n->b, m->b); }
+      if (n->a == 0 || m->a == 0) continue;
+      if (order_by == 0) { if (n->a > m->a) SWAP_TUPLE(*n, *m); }
+      else { if (n->b > m->b) SWAP_TUPLE(*n, *m); }
+    }
+  }
+}
+
+void tuple_sort_all(tuple *l, uint sz) {
+  for (uint i = 0; i < sz - 1; i++) {
+    for (uint j = 0; j < sz - 1 - i; j++) {
+      tuple *n = l + j;
+      tuple *m = l + j + 1;
+      if (n->a == 0 || m->a == 0) continue;
+      if (n->a > m->a) SWAP_TUPLE(*n, *m);
+      else if (n->a == m->a && n->b > m->b) SWAP_TUPLE(*n, *m);
     }
   }
 }
 
 void data_sort(data_mem *d, uint order_by) {
-  tuple_sort(d->r, order_by);
-  tuple_sort(d->s, order_by);
+  tuple_sort(d->r, tuple_sz_max, order_by);
+  tuple_sort(d->s, tuple_sz_max, order_by);
 }
 
 void tuple_list_append(tuple *dest, tuple *src) {
@@ -179,7 +194,38 @@ int main() {
   buffer_free();
 
   buffer_init_large();
+  Log("TEST: Q5 === S U R");
+  tuple *buf = malloc(tuple_sz_max * 2);
+  memset(buf, 0, tuple_sz_max * 2);
+  uint len_s = 0;
+  uint len_r = 0;
+  for (tuple *i = data->s; i->a; i++)
+    len_s++;
+  for (tuple *i = data->r; i->a; i++)
+    len_r++;
+  memcpy(buf, data->s, sizeof(tuple) * len_s);
+  memcpy(buf + len_s, data->r, sizeof(tuple) * len_r);
+  uint len = len_s + len_r;
+  tuple_sort_all(buf, len);
   q = buffered_queue_init(128, -1, false);
+  tuple last_insert = {0, 0};
+  for (tuple *i = buf; i->a; i++) {
+    if (i->a) {
+      Log("(%d, %d)", i->a, i->b);
+      if (!(last_insert.a == i->a && last_insert.b == i->b)) {
+        buffered_queue_push(q, itot(i->a, i->b));
+        last_insert.a = i->a;
+        last_insert.b = i->b;
+      }
+    }
+  }
+  buffered_queue_show(q);
+  buffered_queue_free(q);
+  buffer_free();
+
+  buffer_init();
+  Log("TEST: two stream union");
+
   buffer_free();
   return 0;
 }

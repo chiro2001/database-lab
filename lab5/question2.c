@@ -8,7 +8,7 @@
 
 void TPMMS_sort_subset(uint left, uint right, uint target, bool continuous) {
   buffered_queue *q = buffered_queue_init(BLK, target, false);
-  Dbg("TPMMS_sort_subset(%d, %d, %d)", left, right, target);
+  // Log("TPMMS_sort_subset(%d, %d, %d)", left, right, target);
   // iterate_range_show(left, right);
   // load one subset
   for (uint addr = left; addr < right; addr++)
@@ -50,7 +50,8 @@ iterator *TPMM_reader_select(iterator *readers[BLK - 1]) {
       tuple_copy(smallest, now);
       r = readers[i];
     } else {
-      if (cmp_greater(smallest, now)) {
+      if (cmp_greater(smallest, now) ||
+          (SEQ3(smallest, now) && cmp_greater(smallest + 4, now + 4))) {
         tuple_copy(smallest, now);
         r = readers[i];
       }

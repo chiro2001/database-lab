@@ -6,7 +6,7 @@
 #include "questions.h"
 #include "iterator.h"
 
-void range_sorted_deduplication(uint left, uint right, uint target) {
+void range_sorted_deduplicate(uint left, uint right, uint target) {
   buffered_queue *q = buffered_queue_init(1, target, true);
   char *last_insert = malloc(sizeof(char) * 9);
   *last_insert = '\0';
@@ -22,19 +22,19 @@ void range_sorted_deduplication(uint left, uint right, uint target) {
   free(last_insert);
 }
 
-void deduplication_subsets(uint left, uint right, uint target) {
+void deduplicate_subsets(uint left, uint right, uint target) {
   uint blk_total = right - left;
   uint rounds = blk_total / BLK +
                 ((blk_total % BLK) == 0 ? 0 : 1);
   for (uint r = 0; r < rounds; r++)
-    range_sorted_deduplication(
+    range_sorted_deduplicate(
         left + r * BLK,
         left + (r + 1) * BLK,
         target + r * BLK);
 }
 
-void deduplication_merge_subsets(uint left, uint right, uint target) {
-  Dbg("deduplication_merge_subsets");
+void deduplicate_merge_subsets(uint left, uint right, uint target) {
+  Dbg("deduplicate_merge_subsets");
   uint blk_total = right - left;
   uint reader_count = blk_total / BLK +
                       ((blk_total % BLK) == 0 ? 0 : 1);
@@ -60,18 +60,18 @@ void deduplication_merge_subsets(uint left, uint right, uint target) {
   buffered_queue_free(q);
 }
 
-void sort_deduplication_two_stage_scanning(uint left, uint right, uint target) {
+void sort_deduplicate_two_stage_scanning(uint left, uint right, uint target) {
   uint blk_total = right - left;
   uint temp1 = 400;
   TPMMS_sort_subsets(left, right, temp1);
   // Log("sorted subsets:");
   // iterate_range_show(temp1, temp1 + blk_total);
   uint temp2 = 500;
-  deduplication_subsets(temp1, temp1 + blk_total, temp2);
-  // Log("deduplication subsets:");
+  deduplicate_subsets(temp1, temp1 + blk_total, temp2);
+  // Log("deduplicated subsets:");
   // iterate_range_show(temp2, temp2 + blk_total);
-  deduplication_merge_subsets(temp2, temp2 + blk_total, target);
-  // Log("merged deduplication:");
+  deduplicate_merge_subsets(temp2, temp2 + blk_total, target);
+  // Log("merged deduplicate:");
   // iterate_range_show(target, -1);
 }
 
@@ -83,11 +83,13 @@ void union_two_stage_scanning(uint first, uint second, uint target) {
   *last_insert = '\0';
   char *a = NULL;
   char *b = NULL;
+  Dbg("union_two_stage_scanning started");
   while (true) {
     a = iterator_now(reader_first);
     b = iterator_now(reader_second);
     if (a == NULL || b == NULL) break;
-    if (cmp_greater(a, b)) {
+    if (cmp_greater(a, b) ||
+        (SEQ3(a, b) && cmp_greater(a + 4, b + 4))) {
       if (!SEQ_T(b, last_insert)) {
         buffered_queue_push(q, b);
         tuple_copy(last_insert, b);
@@ -109,13 +111,23 @@ void union_two_stage_scanning(uint first, uint second, uint target) {
     buffered_queue_push(q, a);
     a = iterator_next(reader_first);
   }
+  Dbg("union_two_stage_scanning finished");
   buffered_queue_flush(q);
+  buffered_queue_free(q);
 }
 
 void union_SUR(uint s_left, uint s_right, uint r_left, uint r_right, uint target) {
-  sort_deduplication_two_stage_scanning(s_left, s_right, 500);
-  sort_deduplication_two_stage_scanning(r_left, r_right, 600);
-  union_two_stage_scanning(500, 600, target);
+  uint temp1 = 600, temp2 = 700;
+  sort_deduplicate_two_stage_scanning(s_left, s_right, temp1);
+  // Log(" == S == ");
+  // iterate_range_show(temp1, temp1 + (s_right - s_left));
+  sort_deduplicate_two_stage_scanning(r_left, r_right, temp2);
+  // Log(" == R == ");
+  // iterate_range_show(temp2, temp2 + (r_right - r_left));
+
+  union_two_stage_scanning(temp1, temp2, target);
+  // uint temp3 = 300, temp4 = 400;
+
 }
 
 void q5() {
@@ -125,7 +137,7 @@ void q5() {
   Log("==================");
   buffer_init();
 
-  uint target = 700;
+  uint target = 900;
   union_SUR(1, 7, 17, 49, target);
   iterate_range_show(target, -1);
 

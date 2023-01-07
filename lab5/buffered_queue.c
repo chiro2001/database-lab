@@ -209,6 +209,7 @@ void buffered_queue_sort(buffered_queue *self, int order_by) {
       char *b = buffered_queue_get(blks, j + 1);
       if (order_by == 0) {
         if (cmp_greater(a, b)) SWAP(a, b);
+        else if (SEQ3(a, b) && cmp_greater(a + 4, b + 4)) SWAP(a, b);
       } else {
         if (cmp_greater(a + 4, b + 4)) SWAP(a, b);
       }
