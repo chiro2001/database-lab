@@ -8,17 +8,17 @@
 
 void TPMMS_sort_subset(uint left, uint right, uint target, bool continuous) {
   buffered_queue *q = buffered_queue_init(BLK, target, false);
-  Log("TPMMS_sort_subset(%d, %d, %d), data subset before:", left, right, target);
-  iterate_range_show(left, right);
+  Dbg("TPMMS_sort_subset(%d, %d, %d)", left, right, target);
+  // iterate_range_show(left, right);
   // load one subset
   for (uint addr = left; addr < right; addr++)
     buffered_queue_push_blk(q, addr, continuous);
   // sort in this subset
-  Log("data subset in queue before:");
-  buffered_queue_show(q);
+  // Log("data subset in queue before:");
+  // buffered_queue_show(q);
   buffered_queue_sort(q, 0);
-  Log("data subset in queue after:");
-  buffered_queue_show(q);
+  // Log("data subset in queue after:");
+  // buffered_queue_show(q);
   q->flushable = true;
   buffered_queue_flush(q);
   buffered_queue_free(q);

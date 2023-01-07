@@ -33,13 +33,13 @@ void create_index_range(uint left, uint right, uint addr) {
 }
 
 void indexed_select_linear(uint left, uint right, uint key, buffered_queue *target) {
-  Log("indexed_select_linear(%d, %d, key=%d)", left, right, key);
+  Dbg("indexed_select_linear(%d, %d, key=%d)", left, right, key);
   uint target_addr = -1;
   iterate_range(left, right, lambda(bool, (char *s) {
     uint k = atoi3(s);
     if (k == key) {
       target_addr = atoi3(s + 4);
-      Log("got target addr: %d", target_addr);
+      Dbg("got target addr: %d", target_addr);
     }
     return target_addr == -1;
   }));
@@ -70,23 +70,22 @@ void q3() {
   Log("============================");
   buffer_init();
   Log("正在排序...");
-  // TPMMS(1, 17, 301);
-  Log("S before sort:");
-  iterate_range_show(17, 49);
+  TPMMS(1, 17, 301);
+  // Log("S before sort:");
+  // iterate_range_show(17, 49);
   TPMMS(17, 49, 317);
-  Log("S after sort:");
-  iterate_range_show(317, -1);
+  // Log("S after sort:");
+  // iterate_range_show(317, -1);
   Log("正在建立索引...");
-  // create_index_range(301, 317, 501);
+  create_index_range(301, 317, 501);
   create_index_range(317, 349, 517);
-  Log("S indexes:");
-  iterate_range_show(517, -1);
+  // Log("S indexes:");
+  // iterate_range_show(517, -1);
   buffer_free();
 
   buffer_init();
   Log("索引文件位于 [501...], [517...]");
   buffered_queue *q = buffered_queue_init(1, 600, true);
-  // indexed_select_binary_search(317, 349, 128, q, NULL);
   indexed_select_linear(517, -1, 128, q);
   buffered_queue_flush(q);
   buffered_queue_free(q);
