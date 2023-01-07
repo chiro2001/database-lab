@@ -62,7 +62,7 @@ void TPMMS_merge_sort(uint left, uint right, uint target) {
   Assert(reader_count < BLK, "merge sort cannot have readers more than %d", BLK - 1);
   iterator *readers[BLK - 1] = {NULL};
   for (int i = 0; i < reader_count; i++)
-    readers[i] = iterator_init(left + i * BLK, left + min((i + 1) * BLK, right));
+    readers[i] = iterator_init(left + i * BLK, left + min((i + 1) * BLK, right), NULL);
   buffered_queue *q = buffered_queue_init(1, target, true);
   iterator *reader;
   while ((reader = TPMM_reader_select(readers)) != NULL)

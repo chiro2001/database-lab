@@ -36,13 +36,14 @@ void cache_insert(cache *self, uint addr) {
 }
 
 void cache_remove_index(cache *self, int index) {
-  Log("cache_remove_index(%d)", index);
   if (index < 0 || index >= self->size) return;
   cache_pair *target = &self->data[index];
   if (target == NULL) return;
   free_block(target->blk);
   // move last item to target place
-  memcpy(self->data + self->size, target, sizeof(cache_pair));
+  Log("cache_remove_index(%d), size=%d, move %d to %d in cache",
+      index, self->size, self->data[self->size - 1].addr, target->addr);
+  memcpy(self->data + self->size - 1, target, sizeof(cache_pair));
   self->size--;
 }
 

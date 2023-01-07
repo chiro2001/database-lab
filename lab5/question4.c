@@ -3,6 +3,7 @@
 //
 #include "questions.h"
 #include "main_utils.h"
+#include "buffered_queue.h"
 
 void q4() {
   Log("===================================");
@@ -19,6 +20,7 @@ void q4() {
   cache *ca = cache_init(4);
   iterator *r = iterator_init(301, 317, ca);
   iterator *s = iterator_init(317, 349, ca);
+  buffered_queue *q = buffered_queue_init(1, 700, true);
   while (iterator_now(r) != NULL && iterator_now(s) != NULL) {
     while (cmp_greater(iterator_now(s), iterator_now(r))) {
       iterator_next(r);
@@ -26,11 +28,13 @@ void q4() {
     if (SEQ(iterator_now(s), iterator_now(r))) {
       iterator *r_clone = iterator_clone(r);
       while (SEQ(iterator_now(s), iterator_now(r_clone))) {
+        buffered_queue_push(q, iterator_now(s));
+        buffered_queue_push(q, iterator_now(r_clone));
         iterator_next(r_clone);
       }
+      iterator_free_clone(r_clone);
     }
-    // iterator_next(r);
-    // iterator_next(s);
+    iterator_next(s);
   }
   buffer_report();
   buffer_free();

@@ -7,7 +7,9 @@
 
 char *iterator_next(iterator *it) {
   if (it->offset == 56) {
-    if (it->blk != NULL) free_block(it->blk);
+    if (it->blk != NULL)
+      if (it->ca == NULL)
+        free_block(it->blk);
     if (it->now >= it->end - 1) {
       it->now++;
       it->blk = NULL;
