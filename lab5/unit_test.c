@@ -24,13 +24,13 @@ tuple *load_range(uint left, uint right) {
   memset(list, 0, tuple_sz_max);
   tuple *p = list;
   iterate_range(left, right, lambda(bool, (char *s) {
-    if (*s) {
+      if (*s) {
       // Log("source (%s, %s)", s, s + 4);
       p->a = atoi3(s);
       p->b = atoi3(s + 4);
       p++;
-    }
-    return true;
+  }
+      return true;
   }));
   return list;
 }
@@ -204,7 +204,7 @@ int main() {
   uint cnt = 0;
   for (tuple *i = data->s; i->a; i++) {
     printf("(%d, %d) ", i->a, i->b);
-    if ((++cnt) == 6) {
+    if ((++cnt) == 7) {
       puts("");
       cnt = 0;
     }
@@ -215,7 +215,7 @@ int main() {
   Log(" === R source === ");
   for (tuple *i = data->r; i->a; i++) {
     printf("(%d, %d) ", i->a, i->b);
-    if ((++cnt) == 6) {
+    if ((++cnt) == 7) {
       puts("");
       cnt = 0;
     }
@@ -243,8 +243,32 @@ int main() {
   buffer_free();
 
   buffer_init();
-
-
+  Log("TEST: join connect");
+  Log("select S.C, S.D, R.A, R.B from S inner join R on S.C = R.A");
+  data_mem *data2 = data_clone(data);
+  tuple_sort_all(data2->s, DATA_SZ_MAX);
+  tuple_sort_all(data2->r, DATA_SZ_MAX);
+  tuple result[DATA_SZ_MAX * 3];
+  // q = buffered_queue_init(256, -1, false);
+  uint join_count = 0;
+  for (int i = 0; i < DATA_SZ_MAX; i++) {
+    for (int j = 0; j < DATA_SZ_MAX; j++) {
+      if (!data2->s[i].a || !data2->r[j].a) continue;
+      uint c = data2->s[i].a;
+      uint d = data2->s[i].b;
+      uint a = data2->r[j].a;
+      uint b = data2->r[j].b;
+      if (c == a) {
+        // Log("push (%d, %d) (%d, %d) i=%d, j=%d", c, d, a, b, i, j);
+        // buffered_queue_push(q, itot(c, d));
+        // buffered_queue_push(q, itot(a, b));
+        join_count++;
+      }
+    }
+  }
+  // buffered_queue_show(q);
+  // buffered_queue_free(q);
+  Log("join count = %d", join_count);
   buffer_free();
   return 0;
 }

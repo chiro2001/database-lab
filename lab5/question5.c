@@ -158,9 +158,9 @@ void q5() {
 
   uint target = 900;
   union_SUR(1, 17, 17, 49, target);
-
-  buffered_queue *q = buffered_queue_init(64, -1, false);
   iterate_range_show(target, -1);
+
+  // buffered_queue *q = buffered_queue_init(64, -1, false);
   // iterate_range(target, -1, lambda(bool, (char *s) {
   //   if (*s != '\0') {
   //     // Log("pusing (%s, %s)", s, s + 4);
