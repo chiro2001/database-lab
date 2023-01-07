@@ -66,29 +66,31 @@ void indexed_select_binary_search(uint left, uint right, uint key, buffered_queu
 
 void indexed_select_linear(uint left, uint right, uint key, buffered_queue *target) {
   Log("indexed_select_linear(%d, %d, key=%d)", left, right, key);
-  uint addr_last = -1;
+  // uint addr_last = -1;
+  // bool addr_last_done = false;
   uint addrs[BLK] = {0};
   uint *addrs_pointer = addrs;
   bool addrs_ok = false;
   uint blk_count = 0;
   uint blk_offset = 0;
   iterate_range(left, right, lambda(bool, (char *s) {
-      Log("-> (%s, %s)", s, s + 4);
+      Log("[%d] -> (%s, %s)", blk_count + left, s, s + 4);
       uint k = atoi3(s);
       uint addr = atoi3(s + 4);
       if (k >= key && !addrs_ok) {
-        if (addr_last != -1) {
-          Log("select addr %d", addr_last);
-          *(addrs_pointer++) = addr_last;
-        }
+        // if (addr_last != -1 && !addr_last_done) {
+        //   Log("select addr %d", addr_last);
+        //   *(addrs_pointer++) = addr_last;
+        //   addr_last_done = true;
+        // }
         Log("select addr %d", addr);
         *(addrs_pointer++) = addr;
+        // addr_last = addr;
       }
       if (k > key) {
         addrs_ok = true;
         Log("-> OK");
       }
-      addr_last = addr;
       if ((++blk_offset) == 7) {
         blk_offset = 0;
         blk_count++;
@@ -97,9 +99,12 @@ void indexed_select_linear(uint left, uint right, uint key, buffered_queue *targ
   }));
   uint addrs_sz = addrs_pointer - addrs;
   for (uint *p = addrs; p != addrs_pointer; p++) {
+    Log("reading addr %d", *p);
     iterate_range(*p, *p + 1, lambda(bool, (char *s) {
-        if (*s != '\0' && atoi3(s) == key)
-        buffered_queue_push(target, s);
+        if (*s != '\0' && atoi3(s) == key) {
+          buffered_queue_push(target, s);
+          Log("push (%s, %s)", s, s + 4);
+        }
         return true;
     }));
   }
@@ -124,18 +129,26 @@ void q3() {
   Log("索引文件位于 [501...], [517...]");
   buffered_queue *q = buffered_queue_init(1, 600, true);
   // indexed_select_binary_search(317, 349, 128, q, NULL);
-  indexed_select_linear(517, 520, 128, q);
+  indexed_select_linear(517, -1, 128, q);
   buffered_queue_flush(q);
   buffered_queue_free(q);
   uint count = 0;
+  q = buffered_queue_init(4, -1, false);
   iterate_range(600, -1, lambda(bool, (char *s) {
     if (*s != NULL) {
       Log("-> (%s, %s)", s, s + 4);
+      buffered_queue_push(q, s);
       count++;
     }
     return true;
   }));
   Log("满足选择条件的元组一共 %d 个", count);
+  buffered_queue_sort(q, 1);
+  buffered_queue_iterate(q, lambda(bool, (char *s) {
+    Log("# (%s, %s)", s, s + 4);
+    return true;
+  }));
+  buffered_queue_free(q);
   buffer_report();
   buffer_free();
 }

@@ -15,7 +15,10 @@ void q1() {
 
   buffered_queue *q = buffered_queue_init(1, 100, true);
   iterate_range(17, 49, lambda(bool, (char* c){
-      if (SEQ(c, "128")) buffered_queue_push(q, c);
+      if (SEQ(c, "128")) {
+        Log("push (%s, %s)", c, c + 4);
+        buffered_queue_push(q, c);
+      }
       return true;
   }));
   buffered_queue_flush(q);
@@ -23,15 +26,23 @@ void q1() {
 
   Log("read results:");
   uint count = 0;
+  q = buffered_queue_init(4, -1, false);
   iterate_range(100, -1, lambda(bool, (char* c){
       if (*c) {
         Log("(%s, %s)", c, c + 4);
         count++;
+        buffered_queue_push(q, c);
       }
       return true;
   }));
 
   Log("满足选择条件的元组一共 %d 个", count);
+  buffered_queue_sort(q, 1);
+  buffered_queue_iterate(q, lambda(bool, (char *s) {
+      Log("# (%s, %s)", s, s + 4);
+      return true;
+  }));
+  buffered_queue_free(q);
   buffer_report();
   buffer_free();
 }
