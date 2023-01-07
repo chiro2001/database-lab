@@ -113,7 +113,7 @@ void iterate_range_show(uint left, uint right) {
   iterate_range(left, right, lambda(bool, (char *s) {
       if (*s != '\0') {
       if (cnt == 0) {
-      printf("[%d]\t", addr);
+      printf("[%3d] ", addr);
   }
       printf("(%s, %s) ", s, s + 4);
       if ((cnt++) == 6) {

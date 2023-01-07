@@ -24,12 +24,13 @@ tuple *load_range(uint left, uint right) {
   memset(list, 0, tuple_sz_max);
   tuple *p = list;
   iterate_range(left, right, lambda(bool, (char *s) {
-      if (*s) {
+    if (*s) {
+      Log("source (%s, %s)", s, s + 4);
       p->a = atoi3(s);
       p->b = atoi3(s + 4);
       p++;
-  }
-      return true;
+    }
+    return true;
   }));
   return list;
 }
@@ -80,7 +81,7 @@ void tuple_list_append(tuple *dest, tuple *src) {
 
 data_mem *load_all() {
   tuple r_range = {1, 17};
-  tuple s_range = {17, 48};
+  tuple s_range = {17, 49};
   data_mem *d = malloc(sizeof(data_mem));
   d->r = load_range(r_range.a, r_range.b);
   d->s = load_range(s_range.a, s_range.b);
@@ -199,10 +200,28 @@ int main() {
   memset(buf, 0, tuple_sz_max * 2);
   uint len_s = 0;
   uint len_r = 0;
-  for (tuple *i = data->s; i->a; i++)
+  Log(" === S source === ");
+  uint cnt = 0;
+  for (tuple *i = data->s; i->a; i++) {
+    printf("(%d, %d) ", i->a, i->b);
+    if ((++cnt) == 6) {
+      puts("");
+      cnt = 0;
+    }
     len_s++;
-  for (tuple *i = data->r; i->a; i++)
+  }
+  if (cnt != 0) puts("");
+  cnt = 0;
+  Log(" === R source === ");
+  for (tuple *i = data->r; i->a; i++) {
+    printf("(%d, %d) ", i->a, i->b);
+    if ((++cnt) == 6) {
+      puts("");
+      cnt = 0;
+    }
     len_r++;
+  }
+  if (cnt != 0) puts("");
   memcpy(buf, data->s, sizeof(tuple) * len_s);
   memcpy(buf + len_s, data->r, sizeof(tuple) * len_r);
   uint len = len_s + len_r;
