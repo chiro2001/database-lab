@@ -47,13 +47,37 @@ int main() {
   buffer_free();
 
   buffer_init();
-  // Log("TEST: sort merge join");
-  // int r[] = {20, 30, 30, 30, 31, 33, 35, 0};
-  // int s[] = {21, 22, 30, 30, 32, 43, 45, 0};
-  // int res[20] = {0};
-  // int *p_w = res;
-  // int *p_r = r;
-  // int *p_s = s;
+  Log("TEST: sort merge join");
+  int r[] = {20, 30, 30, 30, 31, 33, 35, 0};
+  int s[] = {21, 22, 30, 30, 32, 43, 45, 0};
+  int res[20] = {0};
+  int *p_w = res;
+  int *p_r = r;
+  int *p_s = s;
+  while (*p_r && *p_s) {
+    bool overflow = false;
+    while (*p_s > *p_r) {
+      p_r++;
+      if (!*p_r) {
+        overflow = true;
+        break;
+      }
+    }
+    if (overflow) break;
+    if (*p_s == *p_r) {
+      int *r_clone = p_r;
+      while (*p_s == *r_clone) {
+        Log("insert: %d, %d", *p_s, *r_clone);
+        *(p_w++) = *p_s;
+        *(p_w++) = *r_clone;
+        r_clone++;
+      }
+    }
+    p_s++;
+  }
+  for (int *pp = res; *pp; pp += 2) {
+    printf("(%d, %d) ", *pp, *(pp + 1));
+  }
   buffer_free();
   return 0;
 }

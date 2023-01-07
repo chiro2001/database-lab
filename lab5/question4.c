@@ -22,9 +22,15 @@ void q4() {
   iterator *s = iterator_init(317, 349, ca);
   buffered_queue *q = buffered_queue_init(1, 700, true);
   while (iterator_now(r) != NULL && iterator_now(s) != NULL) {
+    bool overflow = false;
     while (cmp_greater(iterator_now(s), iterator_now(r))) {
       iterator_next(r);
+      if (iterator_next(r) == NULL) {
+        overflow = true;
+        break;
+      }
     }
+    if (overflow) break;
     if (SEQ(iterator_now(s), iterator_now(r))) {
       iterator *r_clone = iterator_clone(r);
       while (SEQ(iterator_now(s), iterator_now(r_clone))) {
