@@ -42,6 +42,13 @@ void q4() {
     }
     iterator_next(s);
   }
+  buffered_queue_flush(q);
+  buffered_queue_free(q);
+  Log("results:");
+  iterate_range(700, -1, lambda(bool, (char *s) {
+    if (*s != '\0') Log("(%s, %s)", s, s + 4);
+    return true;
+  }));
   buffer_report();
   buffer_free();
 }
