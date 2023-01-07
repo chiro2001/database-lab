@@ -4,6 +4,7 @@
 #include "main_utils.h"
 #include "buffered_queue.h"
 #include "cache.h"
+#include "iterator.h"
 
 #define DATA_SZ_MAX 512
 
@@ -259,7 +260,7 @@ int main() {
       uint a = data2->r[j].a;
       uint b = data2->r[j].b;
       if (c == a) {
-        // Log("push (%d, %d) (%d, %d) i=%d, j=%d", c, d, a, b, i, j);
+        Log("push (%d, %d) (%d, %d) i=%d, j=%d", c, d, a, b, i, j);
         // buffered_queue_push(q, itot(c, d));
         // buffered_queue_push(q, itot(a, b));
         join_count++;
@@ -269,6 +270,60 @@ int main() {
   // buffered_queue_show(q);
   // buffered_queue_free(q);
   Log("join count = %d", join_count);
+  buffer_free();
+
+  buffer_init_large();
+  Log("TEST: iterator clone");
+  // cache *ca = cache_init(4);
+  cache *ca = NULL;
+  iterator *it = iterator_init(1, 17, ca);
+  iterator *it2 = iterator_init(17, 47, ca);
+  iterator *it3 = iterator_init(17, 47, ca);
+  iterator *it4 = iterator_init(1, 17, ca);
+  for (int i = 0; i < 54; i++) iterator_next(it);
+  for (int i = 0; i < 32; i++) iterator_next(it2);
+  for (int i = 0; i < 32; i++) iterator_next(it3);
+  iterator *it_clone = iterator_clone(it);
+  iterator *it2_clone = iterator_clone(it2);
+  iterator *it4_clone = iterator_clone(it4);
+  for (int i = 0; i < 8; i++) {
+    char *c = iterator_next(it_clone);
+    Log(" clone: (%s, %s)", c, c + 4);
+  }
+  for (int i = 0; i < 8; i++) {
+    char *c = iterator_next(it);
+    Log("source: (%s, %s)", c, c + 4);
+  }
+  for (int i = 0; i < 8; i++) {
+    char *c = iterator_next(it2_clone);
+    char *c2 = iterator_next(it3);
+    // Log(" clone: (%s, %s)", c, c + 4);
+    Log(" clone: (%s, %s) - (%s, %s)", c, c + 4, c2, c2 + 4);
+  }
+  for (int i = 0; i < 8; i++) {
+    char *c = iterator_next(it2);
+    // char *c2 = iterator_next(it3);
+    // Log("source: (%s, %s) - (%s, %s)", c, c + 4, c2, c2 + 4);
+    Log("source: (%s, %s)", c, c + 4);
+  }
+
+  for (int i = 0; i < 5; i++) {
+    char *c = iterator_next(it4);
+    char *c2 = iterator_next(it4_clone);
+    Log("s - c: (%s, %s) - (%s, %s)", c, c + 4, c2, c2 + 4);
+  }
+  for (int i = 0; i < 5; i++) {
+    char *c = iterator_next(it4);
+    Log("  s  : (%s, %s)", c, c + 4);
+  }
+  for (int i = 0; i < 5; i++) {
+    char *c = iterator_next(it4_clone);
+    Log("  c  : (%s, %s)", c, c + 4);
+  }
+  iterator_free_clone(it_clone);
+  iterator_free(it);
+  iterator_free_clone(it2_clone);
+  iterator_free(it2);
   buffer_free();
   return 0;
 }
