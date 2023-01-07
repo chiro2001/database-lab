@@ -49,6 +49,12 @@ void buffer_init() {
          "Buffer Initialization Failed!\n");
 }
 
+void buffer_init_large() {
+  uint large_block = BLK * 128;
+  Assert(initBuffer((large_block * (BLK_SZ + 1)), large_block, &g_buf),
+         "Buffer Initialization Failed!\n");
+}
+
 void buffer_free() {
   freeBuffer(&g_buf);
 }
@@ -106,16 +112,16 @@ void iterate_range_show(uint left, uint right) {
   uint addr = left;
   iterate_range(left, right, lambda(bool, (char *s) {
       if (*s != '\0') {
-        if (cnt == 0) {
-          printf("[%d]\t", addr);
-        }
-        printf("(%s, %s) ", s, s + 4);
-        if ((cnt++) == 6) {
-          puts("");
-          cnt = 0;
-          addr++;
-        }
-      }
+      if (cnt == 0) {
+      printf("[%d]\t", addr);
+  }
+      printf("(%s, %s) ", s, s + 4);
+      if ((cnt++) == 6) {
+      puts("");
+      cnt = 0;
+      addr++;
+  }
+  }
       return true;
   }));
   if (cnt != 0) puts("");

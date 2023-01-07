@@ -32,6 +32,8 @@ uint atoi3(const char *s);
 
 void buffer_init();
 
+void buffer_init_large();
+
 void buffer_free();
 
 void buffer_report();

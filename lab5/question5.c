@@ -64,21 +64,21 @@ void sort_deduplication_two_stage_scanning(uint left, uint right, uint target) {
   uint blk_total = right - left;
   uint temp1 = 400;
   TPMMS_sort_subsets(left, right, temp1);
-  Log("sorted subsets:");
-  iterate_range_show(temp1, temp1 + blk_total);
+  // Log("sorted subsets:");
+  // iterate_range_show(temp1, temp1 + blk_total);
   uint temp2 = 500;
   deduplication_subsets(temp1, temp1 + blk_total, temp2);
-  Log("deduplication subsets:");
-  iterate_range_show(temp2, temp2 + blk_total);
+  // Log("deduplication subsets:");
+  // iterate_range_show(temp2, temp2 + blk_total);
   deduplication_merge_subsets(temp2, temp2 + blk_total, target);
-  Log("merged deduplication:");
-  iterate_range_show(target, -1);
+  // Log("merged deduplication:");
+  // iterate_range_show(target, -1);
 }
 
 void union_two_stage_scanning(uint first, uint second, uint target) {
   buffered_queue *q = buffered_queue_init(1, target, true);
   iterator *reader_first = iterator_init(first, -1, NULL);
-  iterator *reader_second = iterator_init(first, -1, NULL);
+  iterator *reader_second = iterator_init(second, -1, NULL);
   char *last_insert = malloc(sizeof(char) * 9);
   *last_insert = '\0';
   char *a = NULL;
@@ -112,17 +112,22 @@ void union_two_stage_scanning(uint first, uint second, uint target) {
   buffered_queue_flush(q);
 }
 
+void union_SUR(uint s_left, uint s_right, uint r_left, uint r_right, uint target) {
+  sort_deduplication_two_stage_scanning(s_left, s_right, 500);
+  sort_deduplication_two_stage_scanning(r_left, r_right, 600);
+  union_two_stage_scanning(500, 600, target);
+}
+
 void q5() {
   Log("==================");
   Log("基于排序的两趟扫描算法");
   Log("实现 S U R");
   Log("==================");
   buffer_init();
-  sort_deduplication_two_stage_scanning(1, 17, 500);
-  sort_deduplication_two_stage_scanning(17, 49, 600);
-  union_two_stage_scanning(500, 600, 700);
 
-  iterate_range_show(700, -1);
+  uint target = 700;
+  union_SUR(1, 7, 17, 49, target);
+  iterate_range_show(target, -1);
 
   buffer_report();
   buffer_free();
