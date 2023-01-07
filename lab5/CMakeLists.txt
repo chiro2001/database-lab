@@ -45,7 +45,7 @@ set(SOURCE_LIST
         cache.c cache.h
         main_utils.h main_utils.c
         iterator.c iterator.h
-        questions.h question1.c question2.c question3.c)
+        questions.h question1.c question2.c question3.c question4.c)
 add_executable(lab5 main.c ${SOURCE_LIST})
 add_executable(unit_test unit_test.c ${SOURCE_LIST})
 add_executable(mem_test test.c ${SOURCE_LIST})
