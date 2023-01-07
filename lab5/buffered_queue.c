@@ -151,7 +151,7 @@ void buffered_queue_iterate(buffered_queue *self, iter_handler(handler)) {
   while (t != NULL) {
     for (int i = 0; i < 7; i++) {
       if (*(t->blk + i * 8) != '\0')
-        handler(t->blk + i * 8);
+        if (!handler(t->blk + i * 8)) return;
     }
     t = t->prev;
   }

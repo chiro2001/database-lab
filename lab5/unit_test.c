@@ -23,8 +23,8 @@ int main() {
     buffered_queue_push(q, itot(100 + rand() % 100, 200 + rand() % 200));
   }
   buffered_queue_sort(q, 0);
-  buffered_queue_iterate(q, lambda(void, (char *c) {
-      Log("(%s, %s)", c, c + 4);
+  buffered_queue_iterate(q, lambda(bool, (char *c) {
+      Log("(%s, %s)", c, c + 4); return true;
   }));
   buffered_queue_free(q);
   Log("TEST: atoi3");

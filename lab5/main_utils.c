@@ -79,7 +79,7 @@ void iterate_range(uint left, uint right, iter_handler(handler)) {
     blk = read_block(block);
     if (handler != NULL)
       for (int i = 0; i < 7; i++)
-        handler(blk + i * 8);
+        if (!handler(blk + i * 8)) return;
     block = atoi3(blk + 56);
     free_block(blk);
     if (block == right) break;

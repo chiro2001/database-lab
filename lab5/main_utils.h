@@ -14,7 +14,7 @@
 #define SEQ3(a, b) (SEQ2(a,b)&&((a)[2]==(b)[2]))
 #define SEQ(a, b) SEQ3(a, b)
 
-#define iter_handler(x) void (*(x))(char*)
+#define iter_handler(x) bool (*(x))(char*)
 
 #define lambda(return_type, function_body) \
   ({return_type lfunc function_body lfunc;})

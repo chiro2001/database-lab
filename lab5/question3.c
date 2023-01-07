@@ -13,11 +13,12 @@ void create_index_range(uint left, uint right, uint addr) {
   uint index = left;
   // storage primary index to secondary place
   // I = (key, block)
-  iterate_range(left, right, lambda(void, (char *s) {
+  iterate_range(left, right, lambda(bool, (char *s) {
       if (++cnt == 7) {
-      cnt = 0;
-      buffered_queue_push(q, itot(atoi3(s), index++));
-  }
+        cnt = 0;
+        buffered_queue_push(q, itot(atoi3(s), index++));
+      }
+      return true;
   }));
 }
 
@@ -63,6 +64,47 @@ void indexed_select_binary_search(uint left, uint right, uint key, buffered_queu
   }
 }
 
+void indexed_select_linear(uint left, uint right, uint key, buffered_queue *target) {
+  Log("indexed_select_linear(%d, %d, key=%d)", left, right, key);
+  uint addr_last = -1;
+  uint addrs[BLK] = {0};
+  uint *addrs_pointer = addrs;
+  bool addrs_ok = false;
+  uint blk_count = 0;
+  uint blk_offset = 0;
+  iterate_range(left, right, lambda(bool, (char *s) {
+      Log("-> (%s, %s)", s, s + 4);
+      uint k = atoi3(s);
+      uint addr = atoi3(s + 4);
+      if (k >= key && !addrs_ok) {
+        if (addr_last != -1) {
+          Log("select addr %d", addr_last);
+          *(addrs_pointer++) = addr_last;
+        }
+        Log("select addr %d", addr);
+        *(addrs_pointer++) = addr;
+      }
+      if (k > key) {
+        addrs_ok = true;
+        Log("-> OK");
+      }
+      addr_last = addr;
+      if ((++blk_offset) == 7) {
+        blk_offset = 0;
+        blk_count++;
+      }
+      return !addrs_ok;
+  }));
+  uint addrs_sz = addrs_pointer - addrs;
+  for (uint *p = addrs; p != addrs_pointer; p++) {
+    iterate_range(*p, *p + 1, lambda(bool, (char *s) {
+        if (*s != '\0' && atoi3(s) == key)
+        buffered_queue_push(target, s);
+        return true;
+    }));
+  }
+}
+
 void q3() {
   Log("============================");
   Log("Q3: 基于索引的关系选择算法");
@@ -80,8 +122,9 @@ void q3() {
 
   buffer_init();
   Log("索引文件位于 [501...], [517...]");
-  buffered_queue *q = buffered_queue_init(1, 500, true);
-  indexed_select_binary_search(317, 349, 128, q, NULL);
+  buffered_queue *q = buffered_queue_init(1, 600, true);
+  // indexed_select_binary_search(317, 349, 128, q, NULL);
+  indexed_select_linear(517, 520, 128, q);
   buffered_queue_flush(q);
   buffered_queue_free(q);
   buffer_report();
