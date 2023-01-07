@@ -82,12 +82,11 @@ uint sort_deduplicate_two_stage_scanning(uint left, uint right, uint target) {
   return skipped;
 }
 
-void union_two_stage_scanning(uint first, uint second, uint target) {
+void union_two_stage_scanning(uint first_left, uint first_right, uint second_left, uint second_right, uint target) {
   buffered_queue *q = buffered_queue_init(1, target, true);
-  iterator *reader_first = iterator_init(first, -1, NULL);
-  iterator *reader_second = iterator_init(second, -1, NULL);
-  char *last_insert = malloc(sizeof(char) * 9);
-  *last_insert = '\0';
+  iterator *reader_first = iterator_init(first_left, first_right, NULL);
+  iterator *reader_second = iterator_init(second_left, second_right, NULL);
+  char last_insert[9] = "";
   char *a = NULL;
   char *b = NULL;
   Dbg("union_two_stage_scanning started");
@@ -111,12 +110,20 @@ void union_two_stage_scanning(uint first, uint second, uint target) {
     }
   }
   while (a == NULL && b != NULL) {
-    buffered_queue_push(q, b);
-    b = iterator_next(reader_second);
+    iterator_next(reader_second);
+    if (!SEQ_T(b, last_insert)) {
+      buffered_queue_push(q, b);
+      tuple_copy(last_insert, b);
+    }
+    b = iterator_now(reader_second);
   }
   while (a != NULL && b == NULL) {
-    buffered_queue_push(q, a);
-    a = iterator_next(reader_first);
+    iterator_next(reader_first);
+    if (!SEQ_T(a, last_insert)) {
+      buffered_queue_push(q, a);
+      tuple_copy(last_insert, a);
+    }
+    a = iterator_now(reader_first);
   }
   Dbg("union_two_stage_scanning finished");
   buffered_queue_flush(q);
@@ -135,28 +142,31 @@ void union_SUR(uint s_left, uint s_right, uint r_left, uint r_right, uint target
   uint skipped_r = sort_deduplicate_two_stage_scanning(r_left, r_right, temp2);
   // Log(" == R deduplicated == ");
   // iterate_range_show(temp2, temp2 + (r_right - r_left));
-  uint skipped = skipped_s + skipped_r;
 
-  // union_two_stage_scanning(temp1, temp2, target);
-  uint temp3 = 300;
-  // sort_deduplicate_two_stage_scanning(temp1, s_right, temp1);
-  buffered_queue *q = buffered_queue_init(1, temp3, true);
-  iterate_range(temp1, -1, lambda(bool, (char *s) {
-    if (*s != '\0') {
-      buffered_queue_push(q, s);
-    }
-    return *s != '\0';
-  }));
-  iterate_range(temp2, -1, lambda(bool, (char *s) {
-      if (*s != '\0') {
-      buffered_queue_push(q, s);
-  }
-      return *s != '\0';
-  }));
-  buffered_queue_flush(q);
-  buffered_queue_free(q);
-  uint total = (s_right - s_left) + (r_right - r_left);
-  sort_deduplicate_two_stage_scanning(temp3, temp3 + total - (skipped / 7), target);
+  union_two_stage_scanning(
+      temp1, temp1 + (s_right - s_left) - skipped_s / 7,
+      temp2, temp2 + (r_right - r_left) - skipped_r / 7, target);
+
+  // uint skipped = skipped_s + skipped_r;
+  // uint temp3 = 300;
+  // // sort_deduplicate_two_stage_scanning(temp1, s_right, temp1);
+  // buffered_queue *q = buffered_queue_init(1, temp3, true);
+  // iterate_range(temp1, -1, lambda(bool, (char *s) {
+  //   if (*s != '\0') {
+  //     buffered_queue_push(q, s);
+  //   }
+  //   return *s != '\0';
+  // }));
+  // iterate_range(temp2, -1, lambda(bool, (char *s) {
+  //     if (*s != '\0') {
+  //     buffered_queue_push(q, s);
+  // }
+  //     return *s != '\0';
+  // }));
+  // buffered_queue_flush(q);
+  // buffered_queue_free(q);
+  // uint total = (s_right - s_left) + (r_right - r_left);
+  // sort_deduplicate_two_stage_scanning(temp3, temp3 + total - (skipped / 7), target);
 }
 
 void q5() {
@@ -171,16 +181,16 @@ void q5() {
   union_SUR(1, 17, 17, 49, target);
 
   buffered_queue *q = buffered_queue_init(64, -1, false);
-  iterate_range_show(target, -1);
-  // iterate_range(target, -1, lambda(bool, (char *s) {
-  //   if (*s != '\0') {
-  //     // Log("pusing (%s, %s)", s, s + 4);
-  //     buffered_queue_push(q, s);
-  //   }
-  //   return *s != '\0';
-  // }));
-  // buffered_queue_show(q);
-  // buffered_queue_free(q);
+  // iterate_range_show(target, -1);
+  iterate_range(target, -1, lambda(bool, (char *s) {
+    if (*s != '\0') {
+      // Log("pusing (%s, %s)", s, s + 4);
+      buffered_queue_push(q, s);
+    }
+    return *s != '\0';
+  }));
+  buffered_queue_show(q);
+  buffered_queue_free(q);
 
   buffer_report();
   buffer_free();
