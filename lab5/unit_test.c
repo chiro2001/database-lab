@@ -25,7 +25,7 @@ tuple *load_range(uint left, uint right) {
   tuple *p = list;
   iterate_range(left, right, lambda(bool, (char *s) {
     if (*s) {
-      Log("source (%s, %s)", s, s + 4);
+      // Log("source (%s, %s)", s, s + 4);
       p->a = atoi3(s);
       p->b = atoi3(s + 4);
       p++;
@@ -230,7 +230,7 @@ int main() {
   tuple last_insert = {0, 0};
   for (tuple *i = buf; i->a; i++) {
     if (i->a) {
-      Log("(%d, %d)", i->a, i->b);
+      // Log("(%d, %d)", i->a, i->b);
       if (!(last_insert.a == i->a && last_insert.b == i->b)) {
         buffered_queue_push(q, itot(i->a, i->b));
         last_insert.a = i->a;

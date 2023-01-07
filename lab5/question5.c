@@ -125,10 +125,10 @@ void union_two_stage_scanning(uint first, uint second, uint target) {
 
 void union_SUR(uint s_left, uint s_right, uint r_left, uint r_right, uint target) {
   uint temp1 = 600, temp2 = 700;
-  Log(" == S source == ");
-  iterate_range_show(s_left, s_right);
-  Log(" == R source == ");
-  iterate_range_show(r_left, r_right);
+  // Log(" == S source == ");
+  // iterate_range_show(s_left, s_right);
+  // Log(" == R source == ");
+  // iterate_range_show(r_left, r_right);
   uint skipped_s = sort_deduplicate_two_stage_scanning(s_left, s_right, temp1);
   // Log(" == S deduplicated == ");
   // iterate_range_show(temp1, temp1 + (s_right - s_left));
@@ -171,16 +171,16 @@ void q5() {
   union_SUR(1, 17, 17, 49, target);
 
   buffered_queue *q = buffered_queue_init(64, -1, false);
-  // iterate_range_show(target, -1);
-  iterate_range(target, -1, lambda(bool, (char *s) {
-    if (*s != '\0') {
-      // Log("pusing (%s, %s)", s, s + 4);
-      buffered_queue_push(q, s);
-    }
-    return *s != '\0';
-  }));
-  buffered_queue_show(q);
-  buffered_queue_free(q);
+  iterate_range_show(target, -1);
+  // iterate_range(target, -1, lambda(bool, (char *s) {
+  //   if (*s != '\0') {
+  //     // Log("pusing (%s, %s)", s, s + 4);
+  //     buffered_queue_push(q, s);
+  //   }
+  //   return *s != '\0';
+  // }));
+  // buffered_queue_show(q);
+  // buffered_queue_free(q);
 
   buffer_report();
   buffer_free();
