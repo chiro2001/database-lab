@@ -18,7 +18,7 @@ void create_index_range(uint left, uint right, uint addr) {
     uint key = atoi3(s);
     if (key != key_last) {
       if (key_last != -1) Assert(key > key_last, "data not in order!");
-      Log("push index (key=%s, addr=%d)", s, index);
+      Dbg("push index (key=%s, addr=%d)", s, index);
       buffered_queue_push(q, itot(key, index));
       key_last = key;
     }
@@ -70,7 +70,9 @@ void q3() {
   Log("============================");
   buffer_init();
   Log("正在排序...");
-  TPMMS(1, 17, 301);
+  // TPMMS(1, 17, 301);
+  Log("S before sort:");
+  iterate_range_show(17, 49);
   TPMMS(17, 49, 317);
   Log("S after sort:");
   iterate_range_show(317, -1);

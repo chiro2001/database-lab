@@ -165,7 +165,7 @@ void buffered_queue_show(buffered_queue *self) {
   buffered_queue_iterate(self, lambda(bool, (char *s) {
     if (*s != '\0') {
       printf("(%s, %s) ", s, s + 4);
-      if ((cnt++) == 7) {
+      if ((cnt++) == 6) {
         puts("");
         cnt = 0;
       }

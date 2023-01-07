@@ -98,12 +98,17 @@ char *block_tuple_tail(char *blk) {
 void iterate_range_show(uint left, uint right) {
   printf("======== data [%d, %d):\n", left, right);
   uint cnt = 0;
+  uint addr = left;
   iterate_range(left, right, lambda(bool, (char *s) {
       if (*s != '\0') {
+        if (cnt == 0) {
+          printf("[%d]\t", addr);
+        }
         printf("(%s, %s) ", s, s + 4);
-        if ((cnt++) == 7) {
+        if ((cnt++) == 6) {
           puts("");
           cnt = 0;
+          addr++;
         }
       }
       return true;
