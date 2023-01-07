@@ -98,7 +98,7 @@ char *block_tuple_tail(char *blk) {
 void iterate_range_show(uint left, uint right) {
   printf("======== data [%d, %d):\n", left, right);
   uint cnt = 0;
-  iterate_range(301, 317, lambda(bool, (char *s) {
+  iterate_range(left, right, lambda(bool, (char *s) {
       if (*s != '\0') {
         printf("(%s, %s) ", s, s + 4);
         if ((cnt++) == 7) {

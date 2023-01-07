@@ -12,94 +12,54 @@ void create_index_range(uint left, uint right, uint addr) {
   uint cnt = 0;
   uint index = left;
   // storage primary index to secondary place
-  // I = (key, block)
+  // I = (key, addr), addr is where key first appears
+  uint key_last = -1;
   iterate_range(left, right, lambda(bool, (char *s) {
-      if (++cnt == 7) {
-        cnt = 0;
-        buffered_queue_push(q, itot(atoi3(s), index++));
-      }
-      return true;
+    uint key = atoi3(s);
+    if (key != key_last) {
+      if (key_last != -1) Assert(key > key_last, "data not in order!");
+      Log("push index (key=%s, addr=%d)", s, index);
+      buffered_queue_push(q, itot(key, index));
+      key_last = key;
+    }
+    if ((++cnt) == 7) {
+      cnt = 0;
+      index++;
+    }
+    return true;
   }));
-}
-
-bool block_contains_key(char *blk, uint key) {
-  for (int i = 0; i < 7; i++)
-    if (atoi3(blk + i * 8) == key) return true;
-  return false;
-}
-
-void indexed_select_binary_search(uint left, uint right, uint key, buffered_queue *target, cache *ca) {
-  if (ca == NULL) ca = cache_init(BLK - 1);
-  if (right == left || right == left + 1) {
-    char *blk_left = cache_read(ca, left);
-    for (int i = 0; i < 7; i++) {
-      char *s = blk_left + i * 8;
-      if (*s != '\0')
-        if (atoi3(s) == key)
-          buffered_queue_push(target, s);
-    }
-    if (left != right) {
-      char *blk_right = cache_read(ca, right);
-      for (int i = 0; i < 7; i++) {
-        char *s = blk_right + i * 8;
-        if (*s != '\0')
-          if (atoi3(s) == key)
-            buffered_queue_push(target, s);
-      }
-    }
-    return;
-  }
-
-  uint mid = (left + right) / 2;
-  char *a = cache_read(ca, left);
-  char *b = cache_read(ca, mid);
-  char *c = cache_read(ca, right);
-  uint key_first = atoi3(a);
-  uint key_middle_left = atoi3(b);
-  uint key_middle_right = atoi3(block_tuple_tail(b));
-  uint key_last = atoi3(block_tuple_tail(c));
-  Assert(key_first <= key && key <= key_last, "key %d not found in range [%d, %d]", key, left, right);
-  if (key_first <= key && key < key_middle_left) {
-
-  }
+  buffered_queue_flush(q);
+  buffered_queue_free(q);
 }
 
 void indexed_select_linear(uint left, uint right, uint key, buffered_queue *target) {
   Log("indexed_select_linear(%d, %d, key=%d)", left, right, key);
-  uint addrs[BLK] = {0};
-  uint *addrs_pointer = addrs;
-  bool addrs_ok = false;
-  uint blk_count = 0;
-  uint blk_offset = 0;
+  uint target_addr = -1;
   iterate_range(left, right, lambda(bool, (char *s) {
-      Log("[%d] -> (%s, %s)", blk_count + left, s, s + 4);
-      uint k = atoi3(s);
-      uint addr = atoi3(s + 4);
-      if (k >= key && !addrs_ok) {
-        Log("select addr %d", addr);
-        *(addrs_pointer++) = addr;
-      }
-      if (k > key) {
-        addrs_ok = true;
-        Log("-> OK");
-      }
-      if ((++blk_offset) == 7) {
-        blk_offset = 0;
-        blk_count++;
-      }
-      return !addrs_ok;
+    uint k = atoi3(s);
+    if (k == key) {
+      target_addr = atoi3(s + 4);
+      Log("got target addr: %d", target_addr);
+    }
+    return target_addr == -1;
   }));
-  uint addrs_sz = addrs_pointer - addrs;
-  for (uint *p = addrs; p != addrs_pointer; p++) {
-    Log("reading addr %d", *p);
-    iterate_range(*p, *p + 1, lambda(bool, (char *s) {
-        if (*s != '\0' && atoi3(s) == key) {
-          buffered_queue_push(target, s);
-          Log("push (%s, %s)", s, s + 4);
-        }
-        return true;
-    }));
-  }
+  Assert(target_addr != -1, "cannot find key %d", key);
+  bool read_started = false;
+  iterate_range(target_addr, -1, lambda(bool, (char *s) {
+    uint k = atoi3(s);
+    if (!read_started) {
+      if (k == key) {
+        buffered_queue_push(target, s);
+        read_started = true;
+      }
+      return true;
+    } else {
+      if (k == key) {
+        buffered_queue_push(target, s);
+      }
+      return k == key;
+    }
+  }));
 }
 
 void q3() {
@@ -112,9 +72,13 @@ void q3() {
   Log("正在排序...");
   TPMMS(1, 17, 301);
   TPMMS(17, 49, 317);
+  Log("S after sort:");
+  iterate_range_show(317, -1);
   Log("正在建立索引...");
-  create_index_range(301, 317, 501);
+  // create_index_range(301, 317, 501);
   create_index_range(317, 349, 517);
+  Log("S indexes:");
+  iterate_range_show(517, -1);
   buffer_free();
 
   buffer_init();
@@ -127,7 +91,7 @@ void q3() {
   uint count = 0;
   q = buffered_queue_init(4, -1, false);
   iterate_range(600, -1, lambda(bool, (char *s) {
-    if (*s != NULL) {
+    if (*s != '\0') {
       // Log("-> (%s, %s)", s, s + 4);
       buffered_queue_push(q, s);
       count++;

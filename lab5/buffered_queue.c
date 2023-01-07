@@ -12,6 +12,7 @@
  * @return 新的 buffered_queue 结构体
  */
 buffered_queue *buffered_queue_init(int sz, uint addr, bool flushable) {
+  Assert(sz > 0, "cannot create empty buffered queue");
   buffered_queue *q = malloc(sizeof(buffered_queue));
   memset(q, 0, sizeof(buffered_queue));
   q->buffer = &g_buf;
