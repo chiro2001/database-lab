@@ -145,12 +145,13 @@ int main() {
   for (int *pp = res; *pp; pp += 2) {
     printf("(%d, %d) ", *pp, *(pp + 1));
   }
+  puts("");
 
   Log("TEST: load data");
   data_mem *data = load_all();
-  for (tuple *i = data->r; i->a; i++) {
-    Log("(%d, %d)", i->a, i->b);
-  }
+  // for (tuple *i = data->r; i->a; i++) {
+  //   Log("(%d, %d)", i->a, i->b);
+  // }
   Log("TEST: Q1/3 select S.C, S.D from S where S.C = 128");
   // for (tuple *i = data->s; i->a; i++) {
   //   if (i->a == 128)
@@ -175,7 +176,10 @@ int main() {
   }));
   buffered_queue_free(q);
 
+  buffer_free();
 
+  buffer_init_large();
+  q = buffered_queue_init(128, -1, false);
   buffer_free();
   return 0;
 }
