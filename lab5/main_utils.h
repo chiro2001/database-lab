@@ -13,6 +13,7 @@
 #define SEQ2(a, b) (((a)[0]==(b)[0])&&((a)[1]==(b)[1]))
 #define SEQ3(a, b) (SEQ2(a,b)&&((a)[2]==(b)[2]))
 #define SEQ(a, b) SEQ3(a, b)
+#define SEQ_T(a, b) (SEQ3(a, b) && SEQ3((a) + 4, (b) + 4))
 
 #define iter_handler(x) bool (*(x))(char*)
 #define handle_iter(x) (bool (*)(char*))(x)

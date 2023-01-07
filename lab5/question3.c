@@ -71,16 +71,10 @@ void q3() {
   buffer_init();
   Log("正在排序...");
   TPMMS(1, 17, 301);
-  // Log("S before sort:");
-  // iterate_range_show(17, 49);
   TPMMS(17, 49, 317);
-  // Log("S after sort:");
-  // iterate_range_show(317, -1);
   Log("正在建立索引...");
   create_index_range(301, 317, 501);
   create_index_range(317, 349, 517);
-  // Log("S indexes:");
-  // iterate_range_show(517, -1);
   buffer_free();
 
   buffer_init();

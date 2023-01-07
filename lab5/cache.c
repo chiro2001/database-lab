@@ -25,7 +25,7 @@ cache_pair *cache_find(cache *self, uint addr) {
 }
 
 void cache_insert(cache *self, uint addr) {
-  Log("cache_insert(%d)", addr);
+  Dbg("cache_insert(%d)", addr);
   Assert(self->size < self->capacity, "insert failed, full");
   // self->cache = realloc(self->cache, ++self->size);
   cache_pair *cache = &self->data[self->size];
@@ -41,7 +41,7 @@ void cache_remove_index(cache *self, int index) {
   if (target == NULL) return;
   free_block(target->blk);
   // move last item to target place
-  Log("cache_remove_index(%d), size=%d, move %d to %d in cache",
+  Dbg("cache_remove_index(%d), size=%d, move %d to %d in cache",
       index, self->size, self->data[self->size - 1].addr, target->addr);
   memcpy(self->data + self->size - 1, target, sizeof(cache_pair));
   self->size--;
