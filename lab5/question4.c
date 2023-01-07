@@ -21,6 +21,7 @@ void q4() {
   iterator *r = iterator_init(301, 317, ca);
   iterator *s = iterator_init(317, 349, ca);
   buffered_queue *q = buffered_queue_init(1, 700, true);
+  uint join_count = 0;
   while (iterator_now(r) != NULL && iterator_now(s) != NULL) {
     bool overflow = false;
     while (cmp_greater(iterator_now(s), iterator_now(r))) {
@@ -36,6 +37,7 @@ void q4() {
       while (SEQ(iterator_now(s), iterator_now(r_clone))) {
         buffered_queue_push(q, iterator_now(s));
         buffered_queue_push(q, iterator_now(r_clone));
+        join_count++;
         iterator_next(r_clone);
       }
       iterator_free_clone(r_clone);
@@ -49,6 +51,7 @@ void q4() {
     if (*s != '\0') Log("(%s, %s)", s, s + 4);
     return true;
   }));
+  Log("连接次数: %d", join_count);
   buffer_report();
   buffer_free();
 }
