@@ -12,8 +12,6 @@
 #include "debug_macros.h"
 
 Buffer *initBuffer(size_t bufSize, size_t blkSize, Buffer *buf) {
-  int i;
-
   buf->numIO = 0;
   buf->bufSize = bufSize;
   buf->blkSize = blkSize;
