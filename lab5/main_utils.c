@@ -20,6 +20,13 @@ char *itot(uint a, uint b) {
   return itot_buffer;
 }
 
+char *itot3(uint a, uint b) {
+  static char itot_buffer[9];
+  sprintf(itot_buffer, "%3u %3u", a, b);
+  itot_buffer[3] = '\0';
+  return itot_buffer;
+}
+
 uint atoi3(const char *s) {
   int a = s[0] - '0', b = s[1] - '0', c = s[2] - '0';
   // Log("s: %s, v: %d%d%d", s, a, b, c);

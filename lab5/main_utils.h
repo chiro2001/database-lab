@@ -28,6 +28,8 @@ char *itoa(uint i);
 
 char *itot(uint a, uint b);
 
+char *itot3(uint a, uint b);
+
 uint atoi3(const char *s);
 
 void buffer_init();

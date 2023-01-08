@@ -128,7 +128,7 @@ uint union_stage(iterator* reader_first, iterator* reader_second, buffered_queue
 }
 
 uint intersect_stage(iterator* reader_first, iterator* reader_second, buffered_queue *target) {
-  char last_insert[9] = "";
+  char last_top[9] = "";
   char *a = NULL;
   char *b = NULL;
   uint skipped = 0;
@@ -138,19 +138,30 @@ uint intersect_stage(iterator* reader_first, iterator* reader_second, buffered_q
     if (a == NULL || b == NULL) break;
     if (cmp_greater(a, b) ||
         (SEQ3(a, b) && cmp_greater(a + 4, b + 4))) {
-      if (SEQ_T(b, last_insert)) {
+      if (SEQ_T(b, last_top)) {
         buffered_queue_push(target, b);
-        tuple_copy(last_insert, b);
       } else skipped++;
+      tuple_copy(last_top, b);
       iterator_next(reader_second);
     } else {
-      if (SEQ_T(a, last_insert)) {
+      if (SEQ_T(a, last_top)) {
         buffered_queue_push(target, a);
-        tuple_copy(last_insert, a);
       } else skipped++;
+      tuple_copy(last_top, a);
       iterator_next(reader_first);
     }
   }
+  while (a == NULL && b != NULL) {
+    iterator_next(reader_second);
+    skipped++;
+    b = iterator_now(reader_second);
+  }
+  while (a != NULL && b == NULL) {
+    iterator_next(reader_first);
+    skipped++;
+    a = iterator_now(reader_first);
+  }
+
   return skipped;
 }
 
@@ -161,7 +172,7 @@ uint two_stage_scanning(uint s_left, uint s_right, uint r_left, uint r_right, ui
   uint skipped_r = sort_deduplicate_two_stage_scanning(r_left, r_right, temp2);
   buffered_queue *q = buffered_queue_init(1, target, true);
   uint first_right = temp1 + (s_right - s_left) - skipped_s / 7;
-  uint second_right = temp2 + (r_right - r_left) - skipped_s / 7;
+  uint second_right = temp2 + (r_right - r_left) - skipped_r / 7;
   iterator *reader_first = iterator_init(temp1, first_right, NULL);
   iterator *reader_second = iterator_init(temp2, second_right, NULL);
   uint skipped_stage2 = fn(reader_first, reader_second, q);
@@ -197,14 +208,14 @@ void q5() {
   Log("计算 S intersects R");
   skipped = two_stage_scanning(1, 17, 17, 49, target, intersect_stage);
   buffer_report_msg("计算 S intersects R");
-  right = target + 47 - skipped / 7;
+  right = target + 48 - skipped / 7;
   Log("计算结果储存于 [%d, %d]", target, right - 1);
   buffer_free();
 
   buffer_init_large();
   q = buffered_queue_init(256, -1, false);
   buffered_queue_load_from(q, target, right);
-  Log("S union R 结果元组数量为 %d", buffered_queue_count(q));
+  Log("S intersects R 结果元组数量为 %d", buffered_queue_count(q));
   buffered_queue_free(q);
   iterate_range_show_some(target, right);
   buffer_free();

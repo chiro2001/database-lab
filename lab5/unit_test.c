@@ -89,6 +89,8 @@ data_mem *load_all() {
   return d;
 }
 
+uint8_t map[1000][1000];
+
 int main() {
   srand(time(NULL));
   buffer_init();
@@ -193,54 +195,6 @@ int main() {
   }));
   buffered_queue_free(q);
 
-  buffer_free();
-
-  buffer_init_large();
-  Log("TEST: Q5 === S U R");
-  tuple *buf = malloc(tuple_sz_max * 2);
-  memset(buf, 0, tuple_sz_max * 2);
-  uint len_s = 0;
-  uint len_r = 0;
-  Log(" === S source === ");
-  uint cnt = 0;
-  for (tuple *i = data->s; i->a; i++) {
-    printf("(%d, %d) ", i->a, i->b);
-    if ((++cnt) == 7) {
-      puts("");
-      cnt = 0;
-    }
-    len_s++;
-  }
-  if (cnt != 0) puts("");
-  cnt = 0;
-  Log(" === R source === ");
-  for (tuple *i = data->r; i->a; i++) {
-    printf("(%d, %d) ", i->a, i->b);
-    if ((++cnt) == 7) {
-      puts("");
-      cnt = 0;
-    }
-    len_r++;
-  }
-  if (cnt != 0) puts("");
-  memcpy(buf, data->s, sizeof(tuple) * len_s);
-  memcpy(buf + len_s, data->r, sizeof(tuple) * len_r);
-  uint len = len_s + len_r;
-  tuple_sort_all(buf, len);
-  q = buffered_queue_init(128, -1, false);
-  tuple last_insert = {0, 0};
-  for (tuple *i = buf; i->a; i++) {
-    if (i->a) {
-      // Log("(%d, %d)", i->a, i->b);
-      if (!(last_insert.a == i->a && last_insert.b == i->b)) {
-        buffered_queue_push(q, itot(i->a, i->b));
-        last_insert.a = i->a;
-        last_insert.b = i->b;
-      }
-    }
-  }
-  buffered_queue_show(q);
-  buffered_queue_free(q);
   buffer_free();
 
   buffer_init();
@@ -409,6 +363,101 @@ int main() {
     iterator_next(it3);
     iterator_next(it4);
   }
+  buffer_free();
+
+  buffer_init_large();
+  Log("TEST: Q5 [ S union R ]");
+  tuple *buf = malloc(tuple_sz_max * 2);
+  memset(buf, 0, tuple_sz_max * 2);
+  uint len_s = 0;
+  uint len_r = 0;
+  Log(" === S source === ");
+  uint cnt = 0;
+  for (tuple *i = data->s; i->a; i++) {
+    printf("(%d, %d) ", i->a, i->b);
+    if ((++cnt) == 7) {
+      puts("");
+      cnt = 0;
+    }
+    len_s++;
+  }
+  if (cnt != 0) puts("");
+  cnt = 0;
+  Log(" === R source === ");
+  for (tuple *i = data->r; i->a; i++) {
+    printf("(%d, %d) ", i->a, i->b);
+    if ((++cnt) == 7) {
+      puts("");
+      cnt = 0;
+    }
+    len_r++;
+  }
+  if (cnt != 0) puts("");
+  fflush(stdout);
+  memcpy(buf, data->s, sizeof(tuple) * len_s);
+  memcpy(buf + len_s, data->r, sizeof(tuple) * len_r);
+  uint len = len_s + len_r;
+  tuple_sort_all(buf, len);
+  q = buffered_queue_init(128, -1, false);
+  tuple last_insert = {0, 0};
+  uint count = 0;
+  for (tuple *i = buf; i->a; i++) {
+    if (i->a) {
+      // Log("(%d, %d)", i->a, i->b);
+      if (!(last_insert.a == i->a && last_insert.b == i->b)) {
+        buffered_queue_push(q, itot(i->a, i->b));
+        count++;
+        last_insert.a = i->a;
+        last_insert.b = i->b;
+      }
+    }
+  }
+  Log("union count: %d", count);
+  buffered_queue_show(q);
+  buffered_queue_free(q);
+  buffer_free();
+
+  buffer_init_large();
+  Log("TEST: Q5 [ S and R ]");
+  len_s = 0;
+  len_r = 0;
+  Log(" === S source === ");
+  cnt = 0;
+  memset(map, 0, sizeof(map));
+  for (tuple *i = data->s; i->a; i++) {
+    printf("(%d, %d) ", i->a, i->b);
+    map[i->a][i->b] = 1;
+    if ((++cnt) == 7) {
+      puts("");
+      cnt = 0;
+    }
+    len_s++;
+  }
+  if (cnt != 0) puts("");
+  cnt = 0;
+  Log(" === R source === ");
+  for (tuple *i = data->r; i->a; i++) {
+    printf("(%d, %d) ", i->a, i->b);
+    if (map[i->a][i->b] == 1) map[i->a][i->b] = 2;
+    if ((++cnt) == 7) {
+      puts("");
+      cnt = 0;
+    }
+    len_r++;
+  }
+  if (cnt != 0) puts("");
+  fflush(stdout);
+  q = buffered_queue_init(128, -1, false);
+  count = 0;
+  for (uint i = 100; i < 1000; i++)
+    for (uint j = 100; j < 1000; j++)
+      if (map[i][j] == 2) {
+        buffered_queue_push(q, itot(i, j));
+        count++;
+      }
+  buffered_queue_show(q);
+  Log("intersection count: %d", count);
+  buffered_queue_free(q);
   buffer_free();
 
   return 0;
