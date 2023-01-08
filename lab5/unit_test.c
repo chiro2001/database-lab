@@ -351,5 +351,41 @@ int main() {
   iterator_free_clone(it2_clone);
   iterator_free(it2);
   buffer_free();
+
+  buffer_init_large();
+  Log("TEST: join connect - 2");
+  Log("select S.C, S.D, R.A, R.B from S inner join R on S.C = R.A");
+  data_mem *data3 = data_clone(data);
+  tuple_sort_all(data3->s, DATA_SZ_MAX);
+  tuple_sort_all(data3->r, DATA_SZ_MAX);
+  // q = buffered_queue_init(256, -1, false);
+  q = buffered_queue_init(1, 800, true);
+  join_count = 0;
+  tuple *it_r = data3->r;
+  tuple *it_s = data3->s;
+  while (it_r->a && it_s->a) {
+    while (it_s->a > it_r->a) {
+      it_r++;
+    }
+    if (it_s->a == it_r->a) {
+      tuple *it_r_clone = it_r;
+      while (it_s->a == it_r_clone->a) {
+        // Log("push (%d, %d) (%d, %d)",
+        //     it_s->a, it_s->b,
+        //     it_r_clone->a, it_r_clone->b);
+        buffered_queue_push(q, itot(it_s->a, it_s->b));
+        buffered_queue_push(q, itot(it_r_clone->a, it_r_clone->b));
+        join_count++;
+        it_r_clone++;
+      }
+    }
+    it_s++;
+  }
+  buffered_queue_flush(q);
+  buffered_queue_free(q);
+  iterate_range_show(800, -1);
+  Log("join count = %d", join_count);
+  buffer_free();
+
   return 0;
 }
