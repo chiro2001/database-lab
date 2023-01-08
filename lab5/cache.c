@@ -4,6 +4,11 @@
 
 #include "cache.h"
 
+/**
+ * 初始化只读缓存
+ * @param capacity
+ * @return
+ */
 cache *cache_init(uint capacity) {
   cache *p = malloc(sizeof(cache));
   memset(p, 0, sizeof(cache));
@@ -13,8 +18,17 @@ cache *cache_init(uint capacity) {
   return p;
 }
 
+/**
+ * 缓存读计数器
+ */
 uint cache_read_cnt = 0;
 
+/**
+ * 在缓存中根据地址找到一块缓冲区
+ * @param self
+ * @param addr
+ * @return 找不到则返回 NULL
+ */
 cache_pair *cache_find(cache *self, uint addr) {
   for (uint i = 0; i < self->size; i++) {
     if (self->data[i].addr == addr) {
@@ -24,6 +38,11 @@ cache_pair *cache_find(cache *self, uint addr) {
   return NULL;
 }
 
+/**
+ * 向缓存中插入对应地址的缓冲区块数据
+ * @param self
+ * @param addr
+ */
 void cache_insert(cache *self, uint addr) {
   Dbg("cache_insert(%d)", addr);
   Assert(self->size < self->capacity, "insert failed, full");
@@ -35,6 +54,11 @@ void cache_insert(cache *self, uint addr) {
   self->size++;
 }
 
+/**
+ * 按照 [[index]] 删除缓存内的数据
+ * @param self
+ * @param index
+ */
 void cache_remove_index(cache *self, int index) {
   if (index < 0 || index >= self->size) return;
   cache_pair *target = &self->data[index];
@@ -47,6 +71,11 @@ void cache_remove_index(cache *self, int index) {
   self->size--;
 }
 
+/**
+ * 按照地址删除缓存内的数据
+ * @param self
+ * @param addr
+ */
 void cache_remove(cache *self, uint addr) {
   cache_pair *target = cache_find(self, addr);
   if (target == NULL) return;
@@ -68,6 +97,13 @@ void cache_kick(cache *self) {
   Assert(self->size + 1 == size_original, "cache kick failed!");
 }
 
+/**
+ * 过缓存地读一个地址。<br/>
+ * 由于使用了全局缓冲区所以不能和其他不过缓冲区的 extmem api 一起使用。
+ * @param self
+ * @param addr
+ * @return
+ */
 char *cache_read(cache *self, uint addr) {
   cache_read_cnt++;
   cache_pair *target = cache_find(self, addr);
@@ -86,6 +122,10 @@ char *cache_read(cache *self, uint addr) {
   return target->blk;
 }
 
+/**
+ * 释放缓存空间
+ * @param self
+ */
 void cache_free(cache *self) {
   if (!self) return;
   for (uint i = 0; i < self->size; i++) {

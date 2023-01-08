@@ -119,6 +119,11 @@ void buffered_queue_push_blk(buffered_queue *self, uint addr, bool continuous) {
   self->size++;
 }
 
+/**
+ * 求当前块链表尾部指针
+ * @param b
+ * @return
+ */
 buffered_queue_blk *buffered_queue_blk_tail(buffered_queue_blk *b) {
   buffered_queue_blk *tail = b;
   while (tail != NULL && tail->next != NULL) {
@@ -145,6 +150,10 @@ void buffered_queue_flush(buffered_queue *self) {
   self->offset = 0;
 }
 
+/**
+ * 清理队列内存
+ * @param self
+ */
 void buffered_queue_free(buffered_queue *self) {
   Dbg("buffered_queue_free");
   buffered_queue_blk *h = self->linked_blk;
@@ -157,6 +166,11 @@ void buffered_queue_free(buffered_queue *self) {
   free(self);
 }
 
+/**
+ * 遍历当前队列在缓冲区中的数据项目
+ * @param self
+ * @param handler
+ */
 void buffered_queue_iterate(buffered_queue *self, iter_handler(handler)) {
   buffered_queue_blk *t = buffered_queue_blk_tail(self->linked_blk);
   if (t == NULL) return;
@@ -169,6 +183,10 @@ void buffered_queue_iterate(buffered_queue *self, iter_handler(handler)) {
   }
 }
 
+/**
+ * 格式化输出当前队列在缓冲区内的数据项目
+ * @param self
+ */
 void buffered_queue_show(buffered_queue *self) {
   printf("======== data in queue (total=%d, size=%d, offset/8=%zu, addr=%d)\n",
          self->total, self->size, self->offset / 8, self->addr);
@@ -187,10 +205,20 @@ void buffered_queue_show(buffered_queue *self) {
   fflush(stdout);
 }
 
+/**
+ * 获取当前队列在缓冲区内的数据项目数量
+ * @param self
+ * @return
+ */
 uint buffered_queue_count(buffered_queue *self) {
   return self->size * 7 + (self->offset) / 8;
 }
 
+/**
+ * 获取当前队列的块地址列表
+ * @param self
+ * @return
+ */
 char **buffered_queue_blks(buffered_queue *self) {
   buffered_queue_blk *t = buffered_queue_blk_tail(self->linked_blk);
   char **blks = malloc(sizeof(char *) * (BLK + 1));
@@ -206,11 +234,22 @@ char **buffered_queue_blks(buffered_queue *self) {
   return blks;
 }
 
+/**
+ * 根据块地址列表获取第 [[index]] 个数据项目
+ * @param blks
+ * @param index
+ * @return
+ */
 char *buffered_queue_get(char **blks, uint index) {
   Assert(index <= BLK * 7, "index out of range");
   return blks[index / 7] + (index % 7) * 8;
 }
 
+/**
+ * 排序当前队列在缓冲区内的数据项目
+ * @param self
+ * @param order_by 从第几项开始比较
+ */
 void buffered_queue_sort(buffered_queue *self, int order_by) {
   char **blks = buffered_queue_blks(self);
   uint sz = buffered_queue_count(self);
