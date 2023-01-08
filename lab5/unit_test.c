@@ -294,56 +294,56 @@ int main() {
   iterator *it4_clone = iterator_clone(it4);
   iterator *it5_clone = iterator_clone(it5);
   for (int i = 0; i < 8; i++) {
-    char *c = iterator_next(it_clone);
+    char *c = iterator_now(it_clone); iterator_next(it_clone);
     Log(" clone: (%s, %s)", c, c + 4);
   }
   for (int i = 0; i < 8; i++) {
-    char *c = iterator_next(it);
+    char *c = iterator_now(it); iterator_next(it);
     Log("source: (%s, %s)", c, c + 4);
   }
   for (int i = 0; i < 8; i++) {
-    char *c = iterator_next(it2_clone);
-    char *c2 = iterator_next(it3);
+    char *c = iterator_now(it2_clone); iterator_next(it2_clone);
+    char *c2 = iterator_now(it3); iterator_next(it3);
     // Log(" clone: (%s, %s)", c, c + 4);
     Log(" clone: (%s, %s) - (%s, %s)", c, c + 4, c2, c2 + 4);
   }
   for (int i = 0; i < 8; i++) {
-    char *c = iterator_next(it2);
-    // char *c2 = iterator_next(it3);
+    char *c = iterator_now(it2); iterator_next(it2);
+    // char *c2 = iterator_now(it3); iterator_next(it3);
     // Log("source: (%s, %s) - (%s, %s)", c, c + 4, c2, c2 + 4);
     Log("source: (%s, %s)", c, c + 4);
   }
 
   for (int i = 0; i < 5; i++) {
-    char *c = iterator_next(it4);
-    char *c2 = iterator_next(it4_clone);
+    char *c = iterator_now(it4); iterator_next(it4);
+    char *c2 = iterator_now(it4_clone); iterator_next(it4_clone);
     Log("s - c: (%s, %s) - (%s, %s)", c, c + 4, c2, c2 + 4);
   }
   for (int i = 0; i < 5; i++) {
-    char *c = iterator_next(it4);
+    char *c = iterator_now(it4); iterator_next(it4);
     Log("  s  : (%s, %s)", c, c + 4);
   }
   for (int i = 0; i < 5; i++) {
-    char *c = iterator_next(it4_clone);
+    char *c = iterator_now(it4_clone); iterator_next(it4_clone);
     Log("  c  : (%s, %s)", c, c + 4);
   }
 
   for (int i = 0; i < 5; i++) {
-    char *c = iterator_next(it5);
-    char *c2 = iterator_next(it5_clone);
+    char *c = iterator_now(it5); iterator_next(it5);
+    char *c2 = iterator_now(it5_clone); iterator_next(it5_clone);
     Log("s - c: (%s, %s) - (%s, %s)", c, c + 4, c2, c2 + 4);
     // Log("s - c: (%s, %s)", c, c + 4);
   }
   // for (int i = 0; i < 6; i++) {
-  //   char *c = iterator_next(it5_clone);
+  //   char *c = iterator_now(it5_clone); iterator_next(it5_clone);
   //   Log("  c  : (%s, %s)", c, c + 4);
   // }
   for (int i = 0; i < 5; i++) {
-    char *c = iterator_next(it5);
+    char *c = iterator_now(it5); iterator_next(it5);
     Log("  s  : (%s, %s)", c, c + 4);
   }
   for (int i = 0; i < 5; i++) {
-    char *c = iterator_next(it5_clone);
+    char *c = iterator_now(it5_clone); iterator_next(it5_clone);
     Log("  c  : (%s, %s)", c, c + 4);
   }
   iterator_free_clone(it_clone);
@@ -359,7 +359,7 @@ int main() {
   tuple_sort_all(data3->s, DATA_SZ_MAX);
   tuple_sort_all(data3->r, DATA_SZ_MAX);
   // q = buffered_queue_init(256, -1, false);
-  q = buffered_queue_init(1, 800, true);
+  q = buffered_queue_init(1, 700, true);
   join_count = 0;
   tuple *it_r = data3->r;
   tuple *it_s = data3->s;
@@ -383,7 +383,7 @@ int main() {
   }
   buffered_queue_flush(q);
   buffered_queue_free(q);
-  iterate_range_show(800, -1);
+  iterate_range_show(700, -1);
   Log("join count = %d", join_count);
   buffer_free();
 

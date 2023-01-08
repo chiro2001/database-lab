@@ -20,21 +20,18 @@ void q4() {
   cache *ca = cache_init(4);
   // cache *ca = NULL;
   iterator *r = iterator_init(301, 317, ca);
+  // iterator *r2 = iterator_init(301, 317, ca);
   iterator *s = iterator_init(317, 349, ca);
   buffered_queue *q = buffered_queue_init(1, 700, true);
   uint join_count = 0;
   while (iterator_now(r) != NULL && iterator_now(s) != NULL) {
-    // bool overflow = false;
     while (cmp_greater(iterator_now(s), iterator_now(r))) {
       iterator_next(r);
-      // if (iterator_now(r) == NULL) {
-      //   overflow = true;
-      //   break;
-      // }
+      // iterator_next(r2);
     }
-    // if (overflow) break;
     if (SEQ(iterator_now(s), iterator_now(r))) {
       iterator *r_clone = iterator_clone(r);
+      // iterator *r_clone = iterator_clone(r2);
       while (SEQ(iterator_now(s), iterator_now(r_clone))) {
         Log("push (%s, %s) (%s, %s)",
             iterator_now(s), iterator_now(s) + 4,

@@ -5,45 +5,36 @@
 #include "iterator.h"
 #include "cache.h"
 
-char *iterator_next(iterator *it) {
+void iterator_next(iterator *it) {
+  if (it->offset != 56)
+    it->offset += 8;
   if (it->offset == 56) {
-    if (it->blk != NULL)
-      if (it->ca == NULL)
-        free_block(it->blk);
-    if (it->now >= it->end - 1) {
-      it->now++;
+    if (it->blk != NULL && it->ca == NULL) free_block(it->blk);
+    if (it->now == it->end - 1 || it->now == it->end) {
+      Log("ends for iterator [%d, %d) now=%d", it->begin, it->end, it->now);
+      if (it->now == it->end - 1)
+        it->now++;
       it->blk = NULL;
-      return NULL;
     } else {
       if (it->end == -1) {
+        // infinity
         Assert(it->ca == NULL, "not implemented");
         Dbg("iterator load new block: %d", it->now + 1);
         it->blk = read_block_try(++it->now);
         if (it->blk == NULL) {
           Assert(g_buf.numFreeBlk > 0, "must caused by not found address");
-          return NULL;
-        } else {
-          it->offset = 0;
-          return iterator_now(it);
         }
       } else {
         Dbg("iterator load new block: %d", it->now + 1);
         it->blk = it->ca ? cache_read(it->ca, ++it->now) : read_block(++it->now);
-        it->offset = 0;
-        return iterator_now(it);
       }
+      it->offset = 0;
     }
   }
-  char *r = iterator_now(it);
-  it->offset += 8;
-  return r;
 }
 
 char *iterator_now(iterator *it) {
-  // Log("iterator [begin now end] offset: [%d %d %d] %d", it->begin, it->now, it->end, it->offset);
-  if (it->offset == 56) {
-    return iterator_next(it);
-  }
+  if (it->offset == 56 && it->now == it->end) return NULL;
   return it->blk + it->offset;
 }
 

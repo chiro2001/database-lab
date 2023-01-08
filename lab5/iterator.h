@@ -17,7 +17,7 @@ typedef struct {
 
 iterator *iterator_init(uint begin, uint end, cache *ca);
 
-char *iterator_next(iterator *it);
+void iterator_next(iterator *it);
 
 void iterator_free(iterator *it);
 
