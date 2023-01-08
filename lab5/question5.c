@@ -153,12 +153,18 @@ uint intersect_stage(iterator* reader_first, iterator* reader_second, buffered_q
   }
   while (a == NULL && b != NULL) {
     iterator_next(reader_second);
-    skipped++;
+    if (SEQ_T(b, last_top)) {
+      buffered_queue_push(target, b);
+      tuple_copy(last_top, b);
+    } else skipped++;
     b = iterator_now(reader_second);
   }
   while (a != NULL && b == NULL) {
     iterator_next(reader_first);
-    skipped++;
+    if (SEQ_T(a, last_top)) {
+      buffered_queue_push(target, a);
+      tuple_copy(last_top, a);
+    } else skipped++;
     a = iterator_now(reader_first);
   }
 
