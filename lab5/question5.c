@@ -167,7 +167,46 @@ uint intersect_stage(iterator* reader_first, iterator* reader_second, buffered_q
     } else skipped++;
     a = iterator_now(reader_first);
   }
+  return skipped;
+}
 
+uint difference_set_stage(iterator* reader_first, iterator* reader_second, buffered_queue *target) {
+  char *a = NULL;
+  char *b = NULL;
+  uint skipped = 0;
+  while (true) {
+    a = iterator_now(reader_first);
+    b = iterator_now(reader_second);
+    if (a == NULL || b == NULL) break;
+    if (cmp_greater(a, b) ||
+        (SEQ3(a, b) && cmp_greater(a + 4, b + 4))) {
+      // a > b
+      skipped++;
+      // a != b, do not insert b
+      iterator_next(reader_second);
+    } else {
+      // a <= b
+      if (!SEQ_T(a, b)) {
+        // a != b, insert a
+        buffered_queue_push(target, a);
+      } else {
+        // a == b, do not insert a or b
+        skipped += 2;
+        iterator_next(reader_second);
+      }
+      iterator_next(reader_first);
+    }
+  }
+  while (a == NULL && b != NULL) {
+    iterator_next(reader_second);
+    skipped++;
+    b = iterator_now(reader_second);
+  }
+  while (a != NULL && b == NULL) {
+    iterator_next(reader_first);
+    buffered_queue_push(target, a);
+    a = iterator_now(reader_first);
+  }
   return skipped;
 }
 
@@ -210,7 +249,7 @@ void q5() {
   buffer_free();
 
   buffer_init();
-  target = 400;
+  target = 350;
   Log("计算 S intersects R");
   skipped = two_stage_scanning(1, 17, 17, 49, target, intersect_stage);
   buffer_report_msg("计算 S intersects R");
@@ -226,5 +265,20 @@ void q5() {
   iterate_range_show_some(target, right);
   buffer_free();
 
+  buffer_init();
+  target = 360;
+  Log("计算 S - R");
+  skipped = two_stage_scanning(1, 17, 17, 49, target, difference_set_stage);
+  buffer_report_msg("计算 S - R");
+  right = target + 48 - skipped / 7;
+  Log("计算结果储存于 [%d, %d]", target, right - 1);
+  buffer_free();
 
+  buffer_init_large();
+  q = buffered_queue_init(256, -1, false);
+  buffered_queue_load_from(q, target, right);
+  Log("S - R 结果元组数量为 %d", buffered_queue_count(q));
+  buffered_queue_free(q);
+  iterate_range_show_some(target, right);
+  buffer_free();
 }
