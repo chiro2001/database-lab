@@ -86,7 +86,6 @@ uint union_stage(iterator* reader_first, iterator* reader_second, buffered_queue
   char last_insert[9] = "";
   char *a = NULL;
   char *b = NULL;
-  Dbg("union_stage started");
   uint skipped = 0;
   while (true) {
     a = iterator_now(reader_first);
@@ -94,12 +93,16 @@ uint union_stage(iterator* reader_first, iterator* reader_second, buffered_queue
     if (a == NULL || b == NULL) break;
     if (cmp_greater(a, b) ||
         (SEQ3(a, b) && cmp_greater(a + 4, b + 4))) {
+      // a > b
+      // 与上次插入不同，可以插入 b
       if (!SEQ_T(b, last_insert)) {
         buffered_queue_push(target, b);
         tuple_copy(last_insert, b);
       } else skipped++;
       iterator_next(reader_second);
     } else {
+      // a <= b
+      // 与上次插入不同，可以插入 a
       if (!SEQ_T(a, last_insert)) {
         buffered_queue_push(target, a);
         tuple_copy(last_insert, a);
@@ -107,6 +110,7 @@ uint union_stage(iterator* reader_first, iterator* reader_second, buffered_queue
       iterator_next(reader_first);
     }
   }
+  // 插入剩下的 b
   while (a == NULL && b != NULL) {
     if (!SEQ_T(b, last_insert)) {
       buffered_queue_push(target, b);
@@ -115,6 +119,7 @@ uint union_stage(iterator* reader_first, iterator* reader_second, buffered_queue
     iterator_next(reader_second);
     b = iterator_now(reader_second);
   }
+  // 插入剩下的 a
   while (a != NULL && b == NULL) {
     if (!SEQ_T(a, last_insert)) {
       buffered_queue_push(target, a);
@@ -123,7 +128,6 @@ uint union_stage(iterator* reader_first, iterator* reader_second, buffered_queue
     iterator_next(reader_first);
     a = iterator_now(reader_first);
   }
-  Dbg("union_stage finished");
   return skipped;
 }
 
@@ -138,12 +142,14 @@ uint intersect_stage(iterator* reader_first, iterator* reader_second, buffered_q
     if (a == NULL || b == NULL) break;
     if (cmp_greater(a, b) ||
         (SEQ3(a, b) && cmp_greater(a + 4, b + 4))) {
+      // a > b, b 与上次的最小值相同则插入 b
       if (SEQ_T(b, last_top)) {
         buffered_queue_push(target, b);
       } else skipped++;
       tuple_copy(last_top, b);
       iterator_next(reader_second);
     } else {
+      // a <= b, a 与上次最小的值相同则插入 a
       if (SEQ_T(a, last_top)) {
         buffered_queue_push(target, a);
       } else skipped++;
@@ -151,6 +157,7 @@ uint intersect_stage(iterator* reader_first, iterator* reader_second, buffered_q
       iterator_next(reader_first);
     }
   }
+  // 去重插入剩下的 b
   while (a == NULL && b != NULL) {
     iterator_next(reader_second);
     if (SEQ_T(b, last_top)) {
@@ -159,6 +166,7 @@ uint intersect_stage(iterator* reader_first, iterator* reader_second, buffered_q
     } else skipped++;
     b = iterator_now(reader_second);
   }
+  // 去重插入剩下的 a
   while (a != NULL && b == NULL) {
     iterator_next(reader_first);
     if (SEQ_T(a, last_top)) {
@@ -213,6 +221,7 @@ uint difference_set_stage(iterator* reader_first, iterator* reader_second, buffe
 uint two_stage_scanning(uint s_left, uint s_right, uint r_left, uint r_right, uint target,
                         uint (*fn)(iterator*, iterator*, buffered_queue*)) {
   uint temp1 = 600, temp2 = 700;
+  // 对两个数据源排序并去重
   uint skipped_s = sort_deduplicate_two_stage_scanning(s_left, s_right, temp1);
   uint skipped_r = sort_deduplicate_two_stage_scanning(r_left, r_right, temp2);
   buffered_queue *q = buffered_queue_init(1, target, true);
@@ -220,6 +229,7 @@ uint two_stage_scanning(uint s_left, uint s_right, uint r_left, uint r_right, ui
   uint second_right = temp2 + (r_right - r_left) - skipped_r / 7;
   iterator *reader_first = iterator_init(temp1, first_right, NULL);
   iterator *reader_second = iterator_init(temp2, second_right, NULL);
+  // 调用函数钩子
   uint skipped_stage2 = fn(reader_first, reader_second, q);
   buffered_queue_flush(q);
   buffered_queue_free(q);

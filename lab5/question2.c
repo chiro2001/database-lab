@@ -8,25 +8,18 @@
 
 void TPMMS_sort_subset(uint left, uint right, uint target, bool continuous) {
   buffered_queue *q = buffered_queue_init(BLK, target, false);
-  // Log("TPMMS_sort_subset(%d, %d, %d)", left, right, target);
-  // iterate_range_show(left, right);
-  // load one subset
+  // 加载数据到 queue
   for (uint addr = left; addr < right; addr++)
     buffered_queue_push_blk(q, addr, continuous);
-  // sort in this subset
-  // Log("data subset in queue before:");
-  // buffered_queue_show(q);
+  // 内排序
   buffered_queue_sort(q, 0);
-  // Log("data subset in queue after:");
-  // buffered_queue_show(q);
+  // 将内排序结果写回磁盘
   q->flushable = true;
   buffered_queue_flush(q);
   buffered_queue_free(q);
-  // iterate_range_show(target, target);
 }
 
 void TPMMS_sort_subsets(uint left, uint right, uint target) {
-  Dbg("TPMMS_sort_subsets");
   uint blk_total = right - left;
   uint rounds = blk_total / BLK +
                 ((blk_total % BLK) == 0 ? 0 : 1);
