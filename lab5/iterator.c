@@ -94,11 +94,12 @@ void iterator_free_clone(iterator *it) {
 }
 
 iterator *iterator_clone(iterator *it) {
-  Assert(it->ca == NULL, "cached iterator cannot clone!");
+  // Assert(it->ca == NULL, "cached iterator cannot clone!");
   iterator *it_new = malloc(sizeof(iterator));
   memcpy(it_new, it, sizeof(iterator));
   Dbg("iterator: creating new buffer for addr %d", it_new->now);
-  it_new->blk = it->ca ? cache_read(it->ca, it->now) : read_block(it->now);
+  // it_new->blk = it->ca ? cache_read(it->ca, it->now) : read_block(it->now);
+  it_new->blk = read_block(it->now);
   // char *blk = read_block(it->now);
   // it_new->blk = alloc_block();
   // free_block(blk);
