@@ -99,10 +99,10 @@ void q2() {
   buffer_init();
   TPMMS(1, 17, 301);
   TPMMS(17, 49, 317);
-  Log("R after sort:");
+  buffer_report_msg("TPMMS");
+  Log("R 排序后:");
   iterate_range_show(301, 317);
-  Log("S after sort:");
+  Log("S 排序后:");
   iterate_range_show(317, -1);
-  buffer_report();
   buffer_free();
 }

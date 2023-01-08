@@ -24,21 +24,12 @@ void q1() {
   buffered_queue_flush(q);
   buffered_queue_free(q);
 
-  Log("read results:");
-  uint count = 0;
+  Log("选择结果:");
   q = buffered_queue_init(4, -1, false);
-  iterate_range(100, -1, lambda(bool, (char* c) {
-    if (*c) {
-      // Log("(%s, %s)", c, c + 4);
-      count++;
-      buffered_queue_push(q, c);
-    }
-    return true;
-  }));
-
-  Log("满足选择条件的元组一共 %d 个", count);
+  buffered_queue_load_from(q, 100, -1);
   buffered_queue_sort(q, 1);
   buffered_queue_show(q);
+  Log("满足选择条件的元组一共 %d 个", buffered_queue_count(q));
   buffered_queue_free(q);
   buffer_report();
   buffer_free();

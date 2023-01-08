@@ -14,6 +14,9 @@ void q4() {
   Log("正在排序...");
   TPMMS(1, 17, 301);
   TPMMS(17, 49, 317);
+  buffer_report_msg("排序过程");
+  buffer_free();
+  buffer_init();
   Log("排序后数据位于:");
   Log("R [A, B], block [301, 316]");
   Log("S [C, D], block [317, 348]");
@@ -43,8 +46,8 @@ void q4() {
   }
   buffered_queue_flush(q);
   buffered_queue_free(q);
-  Log("results:");
-  iterate_range_show(700, -1);
+  // Log("结果:");
+  // iterate_range_show(700, -1);
   Log("连接次数: %d", join_count);
   buffer_report();
   buffer_free();

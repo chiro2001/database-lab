@@ -153,8 +153,7 @@ void q5() {
   Log("基于排序的两趟扫描算法");
   Log("实现 S U R");
   Log("==================");
-  // buffer_init();
-  buffer_init_large();
+  buffer_init();
 
   uint target = 900;
   union_SUR(1, 17, 17, 49, target);

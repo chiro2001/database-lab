@@ -22,6 +22,13 @@ buffered_queue *buffered_queue_init(int sz, uint addr, bool flushable) {
   return q;
 }
 
+void buffered_queue_load_from(buffered_queue *self, uint left, uint right) {
+  iterate_range(left, right, lambda(bool, (char* c) {
+    if (*c != '\0') buffered_queue_push(self, c);
+    return *c != '\0';
+  }));
+}
+
 void buffered_queue_blk_insert(buffered_queue *self, char *blk) {
   buffered_queue_blk *n = malloc(sizeof(buffered_queue_blk));
   n->addr = self->addr;
@@ -170,9 +177,10 @@ void buffered_queue_show(buffered_queue *self) {
         cnt = 0;
       }
     }
-    return true;
+    return *s != '\0';
   }));
   if (cnt != 0) puts("");
+  fflush(stdout);
 }
 
 uint buffered_queue_count(buffered_queue *self) {

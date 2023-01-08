@@ -72,9 +72,13 @@ void q3() {
   Log("正在排序...");
   TPMMS(1, 17, 301);
   TPMMS(17, 49, 317);
+  buffer_report_msg("排序过程");
+  buffer_free();
   Log("正在建立索引...");
+  buffer_init();
   create_index_range(301, 317, 501);
   create_index_range(317, 349, 517);
+  buffer_report_msg("建立索引过程");
   buffer_free();
 
   buffer_init();
@@ -83,18 +87,10 @@ void q3() {
   indexed_select_linear(517, -1, 128, q);
   buffered_queue_flush(q);
   buffered_queue_free(q);
-  uint count = 0;
+  buffer_report_msg("检索过程");
   q = buffered_queue_init(4, -1, false);
-  iterate_range(600, -1, lambda(bool, (char *s) {
-    if (*s != '\0') {
-      // Log("-> (%s, %s)", s, s + 4);
-      buffered_queue_push(q, s);
-      count++;
-    }
-    return true;
-  }));
-  Log("满足选择条件的元组一共 %d 个", count);
-  buffered_queue_sort(q, 1);
+  buffered_queue_load_from(q, 600, -1);
+  Log("满足选择条件的元组一共 %d 个，如下", buffered_queue_count(q));
   buffered_queue_show(q);
   buffered_queue_free(q);
   buffer_report();
