@@ -7,17 +7,18 @@
 		<Option compiler="gcc" />
 		<Build>
 			<Target title="Debug">
-				<Option output="bin\Debug\extmem" prefix_auto="1" extension_auto="1" />
-				<Option object_output="obj\Debug\" />
+				<Option output="bin/Debug/extmem" prefix_auto="1" extension_auto="1" />
+				<Option object_output="obj/Debug/" />
 				<Option type="1" />
 				<Option compiler="gcc" />
 				<Compiler>
 					<Add option="-g" />
+					<Add directory="debug_macros" />
 				</Compiler>
 			</Target>
 			<Target title="Release">
-				<Option output="bin\Release\extmem" prefix_auto="1" extension_auto="1" />
-				<Option object_output="obj\Release\" />
+				<Option output="bin/Release/extmem" prefix_auto="1" extension_auto="1" />
+				<Option object_output="obj/Release/" />
 				<Option type="1" />
 				<Option compiler="gcc" />
 				<Compiler>
@@ -31,17 +32,50 @@
 		<Compiler>
 			<Add option="-Wall" />
 		</Compiler>
+		<Unit filename="buffered_queue.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="buffered_queue.h" />
+		<Unit filename="cache.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="cache.h" />
+		<Unit filename="debug_macros/debug.h" />
+		<Unit filename="debug_macros/debug_macros.h" />
+		<Unit filename="debug_macros/macro.h" />
+		<Unit filename="debug_macros/utils.h" />
 		<Unit filename="extmem.c">
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="extmem.h" />
-		<Unit filename="test.c">
+		<Unit filename="iterator.c">
 			<Option compilerVar="CC" />
 		</Unit>
+		<Unit filename="iterator.h" />
+		<Unit filename="main.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="main_utils.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="main_utils.h" />
+		<Unit filename="question1.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="question2.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="question3.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="question4.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="question5.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="questions.h" />
 		<Extensions>
-			<code_completion />
-			<envvars />
-			<debugger />
 			<lib_finder disable_auto="1" />
 		</Extensions>
 	</Project>
