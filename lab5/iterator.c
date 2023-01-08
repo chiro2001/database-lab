@@ -11,7 +11,7 @@ void iterator_next(iterator *it) {
   if (it->offset == 56) {
     if (it->blk != NULL && it->ca == NULL) free_block(it->blk);
     if (it->now == it->end - 1 || it->now == it->end) {
-      Log("ends for iterator [%d, %d) now=%d", it->begin, it->end, it->now);
+      Dbg("ends for iterator [%d, %d) now=%d", it->begin, it->end, it->now);
       if (it->now == it->end - 1)
         it->now++;
       it->blk = NULL;

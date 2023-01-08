@@ -29,7 +29,7 @@ void q4() {
     if (!iterator_is_end(r) && SEQ(iterator_now(s), iterator_now(r))) {
       iterator *r_clone = iterator_clone(r);
       while (!iterator_is_end(r_clone) && SEQ(iterator_now(s), iterator_now(r_clone))) {
-        Log("push (%s, %s) (%s, %s)",
+        Dbg("push (%s, %s) (%s, %s)",
             iterator_now(s), iterator_now(s) + 4,
             iterator_now(r_clone), iterator_now(r_clone) + 4);
         buffered_queue_push(q, iterator_now(s));

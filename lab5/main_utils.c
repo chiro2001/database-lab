@@ -63,6 +63,10 @@ void buffer_report() {
   Log("Buffer: IO 读写一共 %lu 次", g_buf.numIO);
 }
 
+void buffer_report_msg(const char *msg) {
+  Log("%s: IO 读写一共 %lu 次", msg, g_buf.numIO);
+}
+
 char *read_block(uint addr) {
   char *blk = NULL;
   Assert(NULL != (blk = (char *) readBlockFromDisk(addr, &g_buf)),
