@@ -22,9 +22,9 @@
   ({return_type lfunc function_body lfunc;})
 
 
-typedef uint uint;
+typedef unsigned int uint;
 
-char *itoa(uint i);
+char *itoa_(uint i);
 
 char *itot(uint a, uint b);
 

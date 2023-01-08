@@ -97,3 +97,101 @@
 	"extmem.h"
 	"debug_macros.h"
 
+1673171188 source:d:\programs\database-lab\lab5\extmem.c
+	<stdlib.h>
+	<stdio.h>
+	<string.h>
+	"extmem.h"
+	"debug_macros.h"
+
+1672429005 d:\programs\database-lab\lab5\extmem.h
+	<stdint.h>
+
+1673171188 d:\programs\database-lab\lab5\debug_macros\debug_macros.h
+	<stdint.h>
+	<stdbool.h>
+	<assert.h>
+	<string.h>
+	<macro.h>
+	<debug.h>
+
+1673171188 d:\programs\database-lab\lab5\debug_macros\macro.h
+	<string.h>
+
+1673171188 d:\programs\database-lab\lab5\debug_macros\debug.h
+	<debug_macros.h>
+	<stdio.h>
+	<utils.h>
+	<time.h>
+
+1673171188 d:\programs\database-lab\lab5\debug_macros\utils.h
+	<debug_macros.h>
+	<time.h>
+
+1673171580 source:d:\programs\database-lab\lab5\buffered_queue.c
+	"buffered_queue.h"
+
+1673171188 d:\programs\database-lab\lab5\buffered_queue.h
+	"main_utils.h"
+
+1673171580 d:\programs\database-lab\lab5\main_utils.h
+	<stdio.h>
+	<stdlib.h>
+	<debug_macros.h>
+	"extmem.h"
+
+1673171188 source:d:\programs\database-lab\lab5\cache.c
+	"cache.h"
+
+1673171188 d:\programs\database-lab\lab5\cache.h
+	"main_utils.h"
+
+1673171188 source:d:\programs\database-lab\lab5\iterator.c
+	"iterator.h"
+	"cache.h"
+
+1673171188 d:\programs\database-lab\lab5\iterator.h
+	"main_utils.h"
+	"cache.h"
+
+1673171188 source:d:\programs\database-lab\lab5\main.c
+	"main_utils.h"
+	"questions.h"
+
+1673171188 d:\programs\database-lab\lab5\questions.h
+	"iterator.h"
+	"buffered_queue.h"
+
+1673171580 source:d:\programs\database-lab\lab5\main_utils.c
+	"main_utils.h"
+	"cache.h"
+
+1673171188 source:d:\programs\database-lab\lab5\question1.c
+	"main_utils.h"
+	"buffered_queue.h"
+	"questions.h"
+
+1673171188 source:d:\programs\database-lab\lab5\question2.c
+	"main_utils.h"
+	"questions.h"
+	"buffered_queue.h"
+	"iterator.h"
+
+1673171188 source:d:\programs\database-lab\lab5\question3.c
+	"main_utils.h"
+	"questions.h"
+	"buffered_queue.h"
+	"iterator.h"
+	"cache.h"
+
+1673171188 source:d:\programs\database-lab\lab5\question4.c
+	"questions.h"
+	"main_utils.h"
+	"buffered_queue.h"
+
+1673171188 source:d:\programs\database-lab\lab5\question5.c
+	"main_utils.h"
+	"buffered_queue.h"
+	"questions.h"
+	"iterator.h"
+

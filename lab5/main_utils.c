@@ -10,7 +10,7 @@
  * @param i
  * @return
  */
-char *itoa(uint i) {
+char *itoa_(uint i) {
   static char itoa_buffer[5];
   sprintf(itoa_buffer, "%d", (int) i);
   return itoa_buffer;

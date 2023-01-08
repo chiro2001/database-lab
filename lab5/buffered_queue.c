@@ -42,7 +42,7 @@ void buffered_queue_blk_insert(buffered_queue *self, char *blk) {
 
 void buffered_queue_set_next_addr(buffered_queue *self, bool continuous) {
   strcpy(self->linked_blk->blk + 56,
-         itoa(!continuous && !self->flushable && (self->size == self->total - 1) ? 0 :
+         itoa_(!continuous && !self->flushable && (self->size == self->total - 1) ? 0 :
               self->addr == -1 ? -1 : ++self->addr));
 }
 
