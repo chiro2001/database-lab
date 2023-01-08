@@ -274,18 +274,25 @@ int main() {
 
   buffer_init_large();
   Log("TEST: iterator clone");
-  // cache *ca = cache_init(4);
-  cache *ca = NULL;
+  cache *ca = cache_init(4);
+  // cache *ca = NULL;
   iterator *it = iterator_init(1, 17, ca);
   iterator *it2 = iterator_init(17, 47, ca);
   iterator *it3 = iterator_init(17, 47, ca);
   iterator *it4 = iterator_init(1, 17, ca);
+  q = buffered_queue_init(1, 401, true);
+  for (int i = 0; i < 7 * 32; i++)
+    buffered_queue_push(q, itot(i + 100, i + 100));
+  buffered_queue_flush(q);
+  buffered_queue_free(q);
+  iterator *it5 = iterator_init(401, 417, ca);
   for (int i = 0; i < 54; i++) iterator_next(it);
   for (int i = 0; i < 32; i++) iterator_next(it2);
   for (int i = 0; i < 32; i++) iterator_next(it3);
   iterator *it_clone = iterator_clone(it);
   iterator *it2_clone = iterator_clone(it2);
   iterator *it4_clone = iterator_clone(it4);
+  iterator *it5_clone = iterator_clone(it5);
   for (int i = 0; i < 8; i++) {
     char *c = iterator_next(it_clone);
     Log(" clone: (%s, %s)", c, c + 4);
@@ -318,6 +325,25 @@ int main() {
   }
   for (int i = 0; i < 5; i++) {
     char *c = iterator_next(it4_clone);
+    Log("  c  : (%s, %s)", c, c + 4);
+  }
+
+  for (int i = 0; i < 5; i++) {
+    char *c = iterator_next(it5);
+    char *c2 = iterator_next(it5_clone);
+    Log("s - c: (%s, %s) - (%s, %s)", c, c + 4, c2, c2 + 4);
+    // Log("s - c: (%s, %s)", c, c + 4);
+  }
+  // for (int i = 0; i < 6; i++) {
+  //   char *c = iterator_next(it5_clone);
+  //   Log("  c  : (%s, %s)", c, c + 4);
+  // }
+  for (int i = 0; i < 5; i++) {
+    char *c = iterator_next(it5);
+    Log("  s  : (%s, %s)", c, c + 4);
+  }
+  for (int i = 0; i < 5; i++) {
+    char *c = iterator_next(it5_clone);
     Log("  c  : (%s, %s)", c, c + 4);
   }
   iterator_free_clone(it_clone);
