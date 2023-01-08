@@ -51,7 +51,7 @@ void buffer_init() {
 
 void buffer_init_large() {
   uint large_block = BLK * 128;
-  Assert(initBuffer((large_block * (BLK_SZ + 1)), large_block, &g_buf),
+  Assert(initBuffer((large_block * (BLK_SZ + 1)), BLK_SZ, &g_buf),
          "Buffer Initialization Failed!\n");
 }
 
@@ -78,8 +78,10 @@ char *read_block_try(uint addr) {
   return (char *) readBlockFromDisk(addr, &g_buf);
 }
 
-char *allocBlock() {
-  return (char *) getNewBlockInBuffer(&g_buf);
+char *alloc_block() {
+  char *b = (char *) getNewBlockInBuffer(&g_buf);
+  Assert(b, "cannot allocate new block!");
+  return b;
 }
 
 void free_block(char *blk) {

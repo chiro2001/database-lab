@@ -44,7 +44,7 @@ char *read_block(uint addr);
 
 char *read_block_try(uint addr);
 
-char *allocBlock();
+char *alloc_block();
 
 void free_block(char *blk);
 

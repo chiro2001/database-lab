@@ -20,9 +20,10 @@ void q4() {
   Log("S [C, D], block [317, 348]");
   buffer_free();
 
-  buffer_init();
+  // buffer_init();
+  buffer_init_large();
   Log("Sort-Merge-Join 算法开始...");
-  // cache *ca = cache_init(4);
+  // cache *ca = cache_init(3);
   cache *ca = NULL;
   iterator *r = iterator_init(301, 317, ca);
   iterator *s = iterator_init(317, 349, ca);
@@ -40,7 +41,7 @@ void q4() {
             iterator_now(r_clone) &&
             *iterator_now(r_clone) != '\0' &&
             SEQ(iterator_now(s), iterator_now(r_clone))) {
-        Log("push (%s, %s) (%s, %s)",
+        Dbg("push (%s, %s) (%s, %s)",
             iterator_now(s), iterator_now(s) + 4,
             iterator_now(r_clone), iterator_now(r_clone) + 4);
         buffered_queue_push(q, iterator_now(s));
