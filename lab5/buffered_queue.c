@@ -53,6 +53,10 @@ void buffered_queue_set_next_addr(buffered_queue *self, bool continuous) {
  */
 void buffered_queue_push(buffered_queue *self, char *tuple) {
   Dbg("queue push (%s, %s)", tuple, tuple + 4);
+  if (!tuple) {
+    Err("NULL!");
+    return;
+  }
   if (self->linked_blk == NULL) {
     Dbg("init linked blocks, sizeof(buffered_queue_blk) = %lu", sizeof(buffered_queue_blk));
     self->linked_blk = malloc(sizeof(buffered_queue_blk));

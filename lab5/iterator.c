@@ -10,11 +10,12 @@ void iterator_next(iterator *it) {
     it->offset += 8;
   if (it->offset == 56) {
     if (it->blk != NULL && it->ca == NULL) free_block(it->blk);
-    if (it->now == it->end - 1 || it->now == it->end) {
+    // if (it->now == it->end - 1 || it->now == it->end) {
+    if (it->now == it->end - 1) {
       Dbg("ends for iterator [%d, %d) now=%d", it->begin, it->end, it->now);
-      if (it->now == it->end - 1)
-        it->now++;
-      it->blk = NULL;
+      // if (it->now == it->end - 1)
+      //   it->now++;
+      // it->blk = NULL;
     } else {
       if (it->end == -1) {
         // infinity
@@ -33,8 +34,28 @@ void iterator_next(iterator *it) {
   }
 }
 
+void iterator_prev(iterator *it) {
+  if (it->offset == 0) {
+    it->now--;
+    Log("iterator prev loading addr %d", it->now);
+    Assert(it->now >= it->begin, "iterator prev to begin!");
+    if (it->blk != NULL && it->ca == NULL) free_block(it->blk);
+    it->blk = it->ca ? cache_read(it->ca, it->now) : read_block(it->now);
+    Assert(it->blk, "NULL blk!");
+    it->offset = 56;
+  }
+  it->offset -= 8;
+}
+
+void iterator_prev_n(iterator *it, uint n) {
+  Log("iterator_prev_n(%d), now=%d, offset=%zu", n, it->now, it->offset);
+  while (n--) iterator_prev(it);
+}
+
 char *iterator_now(iterator *it) {
   if (iterator_is_end(it)) return NULL;
+  Log("iterator_now, now=%d, offset=%zu", it->now, it->offset);
+  Assert(it->blk, "now blk NULL");
   return it->blk + it->offset;
 }
 
@@ -51,17 +72,19 @@ iterator *iterator_init(uint begin, uint end, cache *ca) {
 }
 
 bool iterator_is_end(iterator *it) {
-  return it->offset == 56 && it->now == it->end;
+  if (it->offset == 56 && it->now == it->end - 1) return true;
+  Assert(it->blk, "NULL blk");
+  if (*(it->blk + it->offset) == '\0') return true;
+  return false;
 }
 
 void iterator_free(iterator *it) {
-  if (it->blk != NULL) free_block(it->blk);
+  if (!it->ca && it->blk != NULL) free_block(it->blk);
   free(it);
 }
 
 void iterator_free_clone(iterator *it) {
-  if (!it->ca && it->blk)
-    free_block(it->blk);
+  if (!it->ca && it->blk) free_block(it->blk);
   free(it);
 }
 
