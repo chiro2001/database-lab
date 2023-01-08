@@ -418,7 +418,7 @@ int main() {
   buffer_free();
 
   buffer_init_large();
-  Log("TEST: Q5 [ S and R ]");
+  Log("TEST: Q5 [ S intersects R ]");
   len_s = 0;
   len_r = 0;
   Log(" === S source === ");
@@ -457,6 +457,49 @@ int main() {
       }
   buffered_queue_show(q);
   Log("intersection count: %d", count);
+  buffered_queue_free(q);
+  buffer_free();
+
+  buffer_init_large();
+  Log("TEST: Q5 [ S - R ]");
+  len_s = 0;
+  len_r = 0;
+  Log(" === S source === ");
+  cnt = 0;
+  memset(map, 0, sizeof(map));
+  for (tuple *i = data->s; i->a; i++) {
+    printf("(%d, %d) ", i->a, i->b);
+    map[i->a][i->b] = 1;
+    if ((++cnt) == 7) {
+      puts("");
+      cnt = 0;
+    }
+    len_s++;
+  }
+  if (cnt != 0) puts("");
+  cnt = 0;
+  Log(" === R source === ");
+  for (tuple *i = data->r; i->a; i++) {
+    printf("(%d, %d) ", i->a, i->b);
+    if (map[i->a][i->b] == 1) map[i->a][i->b] = 0;
+    if ((++cnt) == 7) {
+      puts("");
+      cnt = 0;
+    }
+    len_r++;
+  }
+  if (cnt != 0) puts("");
+  fflush(stdout);
+  q = buffered_queue_init(128, -1, false);
+  count = 0;
+  for (uint i = 100; i < 1000; i++)
+    for (uint j = 100; j < 1000; j++)
+      if (map[i][j] == 1) {
+        buffered_queue_push(q, itot(i, j));
+        count++;
+      }
+  buffered_queue_show(q);
+  Log("difference set count: %d", count);
   buffered_queue_free(q);
   buffer_free();
 

@@ -108,19 +108,19 @@ uint union_stage(iterator* reader_first, iterator* reader_second, buffered_queue
     }
   }
   while (a == NULL && b != NULL) {
-    iterator_next(reader_second);
     if (!SEQ_T(b, last_insert)) {
       buffered_queue_push(target, b);
       tuple_copy(last_insert, b);
     } else skipped++;
+    iterator_next(reader_second);
     b = iterator_now(reader_second);
   }
   while (a != NULL && b == NULL) {
-    iterator_next(reader_first);
     if (!SEQ_T(a, last_insert)) {
       buffered_queue_push(target, a);
       tuple_copy(last_insert, a);
     } else skipped++;
+    iterator_next(reader_first);
     a = iterator_now(reader_first);
   }
   Dbg("union_stage finished");
@@ -198,13 +198,13 @@ uint difference_set_stage(iterator* reader_first, iterator* reader_second, buffe
     }
   }
   while (a == NULL && b != NULL) {
-    iterator_next(reader_second);
     skipped++;
+    iterator_next(reader_second);
     b = iterator_now(reader_second);
   }
   while (a != NULL && b == NULL) {
-    iterator_next(reader_first);
     buffered_queue_push(target, a);
+    iterator_next(reader_first);
     a = iterator_now(reader_first);
   }
   return skipped;
@@ -236,7 +236,7 @@ void q5() {
   Log("计算 S union R");
   uint skipped = two_stage_scanning(1, 17, 17, 49, target, union_stage);
   buffer_report_msg("计算 S union R");
-  uint right = target + 47 - skipped / 7;
+  uint right = target + 48 - skipped / 7;
   Log("计算结果储存于 [%d, %d]", target, right - 1);
   buffer_free();
 
@@ -268,7 +268,7 @@ void q5() {
   buffer_init();
   target = 360;
   Log("计算 S - R");
-  skipped = two_stage_scanning(1, 17, 17, 49, target, difference_set_stage);
+  skipped = two_stage_scanning(17, 49, 1, 17, target, difference_set_stage);
   buffer_report_msg("计算 S - R");
   right = target + 48 - skipped / 7;
   Log("计算结果储存于 [%d, %d]", target, right - 1);
