@@ -100,9 +100,9 @@ void q2() {
   TPMMS(1, 17, 301);
   TPMMS(17, 49, 317);
   buffer_report_msg("TPMMS");
-  Log("R 排序后:");
-  iterate_range_show(301, 317);
-  Log("S 排序后:");
-  iterate_range_show(317, -1);
+  Log("R 排序后如下，储存于地址 [301, 316]");
+  iterate_range_show_some(301, 317);
+  Log("S 排序后如下，储存于地址 [317, 348]");
+  iterate_range_show_some(317, 349);
   buffer_free();
 }

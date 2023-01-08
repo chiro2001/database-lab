@@ -93,6 +93,5 @@ void q3() {
   Log("满足选择条件的元组一共 %d 个，如下", buffered_queue_count(q));
   buffered_queue_show(q);
   buffered_queue_free(q);
-  buffer_report();
   buffer_free();
 }

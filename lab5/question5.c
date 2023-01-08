@@ -82,7 +82,7 @@ uint sort_deduplicate_two_stage_scanning(uint left, uint right, uint target) {
   return skipped;
 }
 
-void union_two_stage_scanning(uint first_left, uint first_right, uint second_left, uint second_right, uint target) {
+uint union_two_stage_scanning(uint first_left, uint first_right, uint second_left, uint second_right, uint target) {
   buffered_queue *q = buffered_queue_init(1, target, true);
   iterator *reader_first = iterator_init(first_left, first_right, NULL);
   iterator *reader_second = iterator_init(second_left, second_right, NULL);
@@ -90,6 +90,7 @@ void union_two_stage_scanning(uint first_left, uint first_right, uint second_lef
   char *a = NULL;
   char *b = NULL;
   Dbg("union_two_stage_scanning started");
+  uint skipped = 0;
   while (true) {
     a = iterator_now(reader_first);
     b = iterator_now(reader_second);
@@ -99,13 +100,13 @@ void union_two_stage_scanning(uint first_left, uint first_right, uint second_lef
       if (!SEQ_T(b, last_insert)) {
         buffered_queue_push(q, b);
         tuple_copy(last_insert, b);
-      }
+      } else skipped++;
       iterator_next(reader_second);
     } else {
       if (!SEQ_T(a, last_insert)) {
         buffered_queue_push(q, a);
         tuple_copy(last_insert, a);
-      }
+      } else skipped++;
       iterator_next(reader_first);
     }
   }
@@ -114,7 +115,7 @@ void union_two_stage_scanning(uint first_left, uint first_right, uint second_lef
     if (!SEQ_T(b, last_insert)) {
       buffered_queue_push(q, b);
       tuple_copy(last_insert, b);
-    }
+    } else skipped++;
     b = iterator_now(reader_second);
   }
   while (a != NULL && b == NULL) {
@@ -122,15 +123,16 @@ void union_two_stage_scanning(uint first_left, uint first_right, uint second_lef
     if (!SEQ_T(a, last_insert)) {
       buffered_queue_push(q, a);
       tuple_copy(last_insert, a);
-    }
+    } else skipped++;
     a = iterator_now(reader_first);
   }
   Dbg("union_two_stage_scanning finished");
   buffered_queue_flush(q);
   buffered_queue_free(q);
+  return skipped;
 }
 
-void union_SUR(uint s_left, uint s_right, uint r_left, uint r_right, uint target) {
+uint union_SUR(uint s_left, uint s_right, uint r_left, uint r_right, uint target) {
   uint temp1 = 600, temp2 = 700;
   // Log(" == S source == ");
   // iterate_range_show(s_left, s_right);
@@ -143,33 +145,32 @@ void union_SUR(uint s_left, uint s_right, uint r_left, uint r_right, uint target
   // Log(" == R deduplicated == ");
   // iterate_range_show(temp2, temp2 + (r_right - r_left));
 
-  union_two_stage_scanning(
+  uint skipped_stage2 = union_two_stage_scanning(
       temp1, temp1 + (s_right - s_left) - skipped_s / 7,
       temp2, temp2 + (r_right - r_left) - skipped_r / 7, target);
+  return skipped_s + skipped_r + skipped_stage2;
 }
 
 void q5() {
-  Log("==================");
-  Log("基于排序的两趟扫描算法");
+  Log("=====================");
+  Log("Q5: 基于排序的两趟扫描算法");
   Log("实现 S U R");
-  Log("==================");
+  Log("=====================");
   buffer_init();
 
   uint target = 900;
-  union_SUR(1, 17, 17, 49, target);
-  iterate_range_show(target, -1);
+  uint skipped = union_SUR(1, 17, 17, 49, target);
+  buffer_report_msg("计算 S U R");
+  uint right = target + 47 - skipped / 7;
+  Log("计算结果储存于 [%d, %d]", target, right - 1);
+  buffer_free();
 
-  // buffered_queue *q = buffered_queue_init(64, -1, false);
-  // iterate_range(target, -1, lambda(bool, (char *s) {
-  //   if (*s != '\0') {
-  //     // Log("pusing (%s, %s)", s, s + 4);
-  //     buffered_queue_push(q, s);
-  //   }
-  //   return *s != '\0';
-  // }));
-  // buffered_queue_show(q);
-  // buffered_queue_free(q);
+  buffer_init_large();
+  buffered_queue *q = buffered_queue_init(256, -1, false);
+  buffered_queue_load_from(q, target, right);
+  Log("结果元组数量为 %d", buffered_queue_count(q));
+  buffered_queue_free(q);
+  iterate_range_show_some(target, right);
 
-  buffer_report();
   buffer_free();
 }

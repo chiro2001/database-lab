@@ -7,7 +7,7 @@
 int main() {
   Log("Lab5 program launched!");
 
-  Log("Table and data struct:");
+  Log("表结构和数据存储位置:");
   Log("R [A, B], block [1,  16]");
   Log("S [C, D], block [17, 48]");
 

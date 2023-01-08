@@ -13,7 +13,8 @@ void q1() {
 
   buffer_init();
 
-  buffered_queue *q = buffered_queue_init(1, 100, true);
+  uint target = 100;
+  buffered_queue *q = buffered_queue_init(1, target, true);
   iterate_range(17, 49, lambda(bool, (char* c) {
     if (SEQ(c, "128")) {
       Dbg("push (%s, %s)", c, c + 4);
@@ -24,9 +25,9 @@ void q1() {
   buffered_queue_flush(q);
   buffered_queue_free(q);
 
-  Log("选择结果:");
+  Log("选择结果如下，储存于地址 %d", target);
   q = buffered_queue_init(4, -1, false);
-  buffered_queue_load_from(q, 100, -1);
+  buffered_queue_load_from(q, target, -1);
   buffered_queue_sort(q, 1);
   buffered_queue_show(q);
   Log("满足选择条件的元组一共 %d 个", buffered_queue_count(q));

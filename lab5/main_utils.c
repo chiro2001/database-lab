@@ -131,3 +131,38 @@ void iterate_range_show(uint left, uint right) {
   }));
   if (cnt != 0) puts("");
 }
+
+void iterate_range_show_some(uint left, uint right) {
+  if (right == -1 || (right != -1 && right - left <= 4)) {
+    iterate_range_show(left, right);
+    return;
+  }
+  printf("======== data [%d, %d):\n", left, right);
+  uint cnt = 0;
+  uint addr = left;
+  bool points = false;
+  iterate_range(left, right, lambda(bool, (char *s) {
+    if (*s != '\0') {
+      if (addr - left < 2 || right - addr <= 2) {
+        if (cnt == 0) {
+          printf("[%3d] ", addr);
+        }
+        printf("(%s, %s) ", s, s + 4);
+      } else {
+        if (!points) {
+          points = true;
+          printf("     ... ...\n");
+        }
+      }
+      if ((cnt++) == 6) {
+        if (addr - left < 2 || right - addr <= 2)
+          puts("");
+        cnt = 0;
+        addr++;
+      }
+    }
+    fflush(stdout);
+    return true;
+  }));
+  if (cnt != 0) puts("");
+}

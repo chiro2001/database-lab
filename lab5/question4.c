@@ -6,25 +6,28 @@
 #include "buffered_queue.h"
 
 void q4() {
-  Log("===================================");
-  Log("基于排序的连接操作算法(Sort-Merge-Join)");
+  Log("======================================");
+  Log("Q4: 基于排序的连接操作算法(Sort-Merge-Join)");
   Log("select S.C, S.D, R.A, R.B from S inner join R on S.C = R.A");
-  Log("===================================");
+  Log("======================================");
   buffer_init();
   Log("正在排序...");
   TPMMS(1, 17, 301);
   TPMMS(17, 49, 317);
   buffer_report_msg("排序过程");
-  buffer_free();
-  buffer_init();
   Log("排序后数据位于:");
   Log("R [A, B], block [301, 316]");
   Log("S [C, D], block [317, 348]");
+  buffer_free();
+
+  buffer_init();
+  Log("Sort-Merge-Join 算法开始...");
   // cache *ca = cache_init(4);
   cache *ca = NULL;
   iterator *r = iterator_init(301, 317, ca);
   iterator *s = iterator_init(317, 349, ca);
-  buffered_queue *q = buffered_queue_init(1, 700, true);
+  uint target = 700;
+  buffered_queue *q = buffered_queue_init(1, target, true);
   uint join_count = 0;
   while (!iterator_is_end(r) && !iterator_is_end(s)) {
     while (!iterator_is_end(r) && cmp_greater(iterator_now(s), iterator_now(r)))
@@ -46,8 +49,8 @@ void q4() {
   }
   buffered_queue_flush(q);
   buffered_queue_free(q);
-  // Log("结果:");
-  // iterate_range_show(700, -1);
+  Log("结果:");
+  iterate_range_show_some(target, target + join_count * 2 / 7 + 1);
   Log("连接次数: %d", join_count);
   buffer_report();
   buffer_free();
