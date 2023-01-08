@@ -274,8 +274,8 @@ int main() {
 
   buffer_init_large();
   Log("TEST: iterator clone");
-  cache *ca = cache_init(4);
-  // cache *ca = NULL;
+  // cache *ca = cache_init(4);
+  cache *ca = NULL;
   iterator *it = iterator_init(1, 17, ca);
   iterator *it2 = iterator_init(17, 47, ca);
   iterator *it3 = iterator_init(17, 47, ca);

@@ -34,7 +34,7 @@ void iterator_next(iterator *it) {
 }
 
 char *iterator_now(iterator *it) {
-  if (it->offset == 56 && it->now == it->end) return NULL;
+  if (iterator_is_end(it)) return NULL;
   return it->blk + it->offset;
 }
 
@@ -50,17 +50,26 @@ iterator *iterator_init(uint begin, uint end, cache *ca) {
   return it;
 }
 
+bool iterator_is_end(iterator *it) {
+  return it->offset == 56 && it->now == it->end;
+}
+
 void iterator_free(iterator *it) {
   if (it->blk != NULL) free_block(it->blk);
   free(it);
 }
 
 void iterator_free_clone(iterator *it) {
+  if (!it->ca && it->blk)
+    free_block(it->blk);
   free(it);
 }
 
 iterator *iterator_clone(iterator *it) {
+  Assert(it->ca == NULL, "cached iterator cannot clone!");
   iterator *it_new = malloc(sizeof(iterator));
   memcpy(it_new, it, sizeof(iterator));
+  // create a new buffer
+  it_new->blk = it->ca ? cache_read(it->ca, it->now) : read_block(it->now);
   return it_new;
 }

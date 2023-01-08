@@ -27,4 +27,6 @@ void iterator_free_clone(iterator *it);
 
 char *iterator_now(iterator *it);
 
+bool iterator_is_end(iterator *it);
+
 #endif //LAB5_ITERATOR_H
