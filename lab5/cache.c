@@ -87,6 +87,10 @@ char *cache_read(cache *self, uint addr) {
 }
 
 void cache_free(cache *self) {
+  if (!self) return;
+  for (uint i = 0; i < self->size; i++) {
+    free_block(self->data[i].blk);
+  }
   free(self->data);
   free(self);
 }

@@ -34,6 +34,10 @@ void iterator_next(iterator *it) {
   }
 }
 
+void iterator_next_n(iterator *it, uint n) {
+  while (n--) iterator_next(it);
+}
+
 void iterator_prev(iterator *it) {
   if (it->offset == 0) {
     it->now--;
@@ -90,12 +94,14 @@ void iterator_free_clone(iterator *it) {
 }
 
 iterator *iterator_clone(iterator *it) {
-  // Assert(it->ca == NULL, "cached iterator cannot clone!");
+  Assert(it->ca == NULL, "cached iterator cannot clone!");
   iterator *it_new = malloc(sizeof(iterator));
   memcpy(it_new, it, sizeof(iterator));
-  Log("creating new buffer for addr %d", it_new->now);
-  char *blk = it->ca ? cache_read(it->ca, it->now) : read_block(it->now);
-  it_new->blk = alloc_block();
-  memcpy(it_new->blk, blk, 48 + 4);
+  Dbg("iterator: creating new buffer for addr %d", it_new->now);
+  it_new->blk = it->ca ? cache_read(it->ca, it->now) : read_block(it->now);
+  // char *blk = read_block(it->now);
+  // it_new->blk = alloc_block();
+  // free_block(blk);
+  // memcpy(it_new->blk, blk, BLK_SZ);
   return it_new;
 }

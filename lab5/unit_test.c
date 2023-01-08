@@ -120,14 +120,14 @@ int main() {
   buffer_free();
   buffer_init();
   Log("TEST: buffered cache");
-  cache *p = cache_init(2);
+  cache *ca = cache_init(2);
   for (int addr = 1; addr < 49; addr++) {
-    Assert(cache_read(p, addr) != NULL, "cache read err, addr: %d", addr);
+    Assert(cache_read(ca, addr) != NULL, "cache read err, addr: %d", addr);
   }
   for (int i = 0; i < 500; i++) {
-    Assert(cache_read(p, (rand() % 48) + 1) != NULL, "cache read err, addr: %d", i);
+    Assert(cache_read(ca, (rand() % 48) + 1) != NULL, "cache read err, addr: %d", i);
   }
-  cache_free(p);
+  cache_free(ca);
   buffer_free();
 
   buffer_init();
@@ -274,8 +274,8 @@ int main() {
 
   buffer_init_large();
   Log("TEST: iterator clone");
-  // cache *ca = cache_init(4);
-  cache *ca = NULL;
+  // ca = cache_init(4);
+  ca = NULL;
   iterator *it = iterator_init(1, 17, ca);
   iterator *it2 = iterator_init(17, 47, ca);
   iterator *it3 = iterator_init(17, 47, ca);
@@ -350,6 +350,7 @@ int main() {
   iterator_free(it);
   iterator_free_clone(it2_clone);
   iterator_free(it2);
+  cache_free(ca);
   buffer_free();
 
   buffer_init_large();
@@ -385,6 +386,29 @@ int main() {
   buffered_queue_free(q);
   iterate_range_show(700, -1);
   Log("join count = %d", join_count);
+  buffer_free();
+
+  buffer_init_large();
+  Log("TEST: cache and iterator");
+  ca = cache_init(4);
+  it = iterator_init(1, 17, ca);
+  it2 = iterator_init(1, 17, NULL);
+  iterator_next_n(it, 23);
+  iterator_next_n(it2, 23);
+  it3 = iterator_clone(it);
+  it4 = iterator_clone(it2);
+  while (!iterator_is_end(it3)) {
+    char *a = iterator_now(it), *b = iterator_now(it2);
+    char *c = iterator_now(it3), *d = iterator_now(it4);
+    Log("cached: (%s, %s), uncached: (%s, %s)",
+        a, a + 4, b, b + 4);
+    Log("clone1: (%s, %s),   clone2: (%s, %s)",
+        c, c + 4, d, d + 4);
+    iterator_next(it);
+    iterator_next(it2);
+    iterator_next(it3);
+    iterator_next(it4);
+  }
   buffer_free();
 
   return 0;

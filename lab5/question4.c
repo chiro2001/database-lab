@@ -20,10 +20,10 @@ void q4() {
   Log("S [C, D], block [317, 348]");
   buffer_free();
 
-  // buffer_init();
-  buffer_init_large();
+  buffer_init();
+  // buffer_init_large();
   Log("Sort-Merge-Join 算法开始...");
-  // cache *ca = cache_init(3);
+  // cache *ca = cache_init(1000);
   cache *ca = NULL;
   iterator *r = iterator_init(301, 317, ca);
   iterator *s = iterator_init(317, 349, ca);
@@ -59,7 +59,7 @@ void q4() {
   buffered_queue_free(q);
   uint right = target + join_count * 2 / 7 + 1;
   Log("结果如下，储存于 [%d, %d]", target, right - 1);
-  iterate_range_show_some(target, right);
+  iterate_range_show(target, right);
   Log("连接次数: %d", join_count);
   buffer_report();
   buffer_free();

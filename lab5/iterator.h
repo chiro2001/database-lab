@@ -19,6 +19,8 @@ iterator *iterator_init(uint begin, uint end, cache *ca);
 
 void iterator_next(iterator *it);
 
+void iterator_next_n(iterator *it, uint n);
+
 void iterator_prev(iterator *it);
 
 void iterator_prev_n(iterator *it, uint n);
